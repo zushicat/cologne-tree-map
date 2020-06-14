@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+
+    <link rel="shortcut icon" href="src/tree_favicon.png">
+
+    <!-- mapbox -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css' rel='stylesheet' />
+
+    <!-- mapbox geocoder -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.5.1/mapbox-gl-geocoder.css" type="text/css"/>
+    <!-- Promise polyfill script required to use Mapbox GL Geocoder in IE 11 -->
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
+
+
+    <!-- <script src="lib/dom-to-image.min.js"></script> -->
+    <script src="lib/echarts.min.js"></script>
+    <script src="lib/jquery-3.3.1.min.js"></script>
+    <!-- <script src="lib/js.cookie.min.js"></script> -->
+
+    <!-- onsen -->
+    <link rel="stylesheet" href="lib/OnsenUI-dist-2.10.10/css/onsenui.css">
+    <link rel="stylesheet" href="lib/OnsenUI-dist-2.10.10/css/onsen-css-components.min.css">
+    <script src="lib/OnsenUI-dist-2.10.10/js/onsenui.min.js"></script>
+ 
+    <!-- jszip -->
+    <!-- https://stuk.github.io/jszip/ -->
+    <script src="lib/jszip/jszip.min.js"></script>
+    <script src="lib/jszip/jszip-utils.min.js"></script>
+
+    <style>
+        /* ************************** */
+        /* page */
+        /* ************************** */
+        body
+        {
+            font-weight: 400;
+            font-size: 17px;
+            line-height: 32px;
+        }
+        .page__background { background-color: #fff; }
+
+        /* ************************** */
+        /* content container */
+        /* ************************** */
+        .content_container { margin: 20px; }
+
+        /* ************************** */
+        /* map */
+        /* ************************** */
+        #tree_map {
+            width: 100%;
+            height: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ************************************* -->
+    <!-- modal on init -->
+    <!-- ************************************* -->
+    <ons-modal direction="up">
+        <div style="text-align: center">
+        <ons-icon icon="md-spinner" size="60px" spin></ons-icon>
+        </div>
+    </ons-modal>
+
+    <!-- ************************************* -->
+    <!-- start navigator -->
+    <!-- ************************************* -->
+    <ons-navigator id="myNavigator" page="map_section.html"></ons-navigator>
+
+    <!-- ************************************* -->
+    <!-- map section -->
+    <!-- ************************************* -->
+    <template id="map_section.html">
+        <ons-page id="map_section">
+            <div class="content_container">
+                <h1>Cologne Tree Map</h1>
+                <p>
+                    Visualization of Cologne Tree Data. <b>As of now, this is work in progress.</b><br>
+                    Check out <a href="https://github.com/zushicat/cologne-trees-REST-API" target="_blank">this github repository</a> for detailled information about the used data.
+                </p>
+            </div>
+
+            <!-- ****************************** -->
+            <!-- elements for map interaction -->
+            <!-- ****************************** -->
+            <div id="map_stuff">
+                <div class="content_container" id="map_interaction_container">
+                    <ons-list>
+                        <!-- ***** -->
+                        <ons-list-item tappable>
+                            <label class="left">
+                                <ons-checkbox input-id="nav_show_district_borders" checked></ons-checkbox>
+                            </label>
+                            <label for="nav_show_district_borders" class="center">
+                                Show Borders of Suburbs
+                            </label>
+                        </ons-list-item>
+                        
+                        <!-- ***** -->
+                        <ons-list-item tappable expandable>
+                            Show trees in selected districts
+                            <div class="expandable-content">
+                                <!-- dynamically created district list as 3x3 grid: build_district_selection_grid() -->
+                                <!-- hardcoded in fct: start with restricted tree display of Innenstadt and Ehrendfeld -->
+                                <ons-row id="nav_selected_districts_container"></ons-row>
+                            </div>
+                        </ons-list-item>
+                    </ons-list>
+                    
+                    <nav id="menu"></nav>
+                </div>
+            </div>
+
+            <div id="tree_map"></div>
+        </ons-page>
+    </template>
+
+
+    <!-- ************************************* -->
+    <!-- script section -->
+    <!-- ************************************* -->
+    <script>
+        var MAP;
+
+        var TREE_DATA_BY_ID = {};
+        var TREE_MAP_FEATURES = {};  // object of lists by district id
+
+        var DISTRICT_MAP_FEATURES = [];
+        var SUBURB_LIST = []
+
+        var DISPLAY_DISTRICT_BORDERS = false;
+        var DISPLAY_TREES_DISTRICTS = [];
+
+        var DISTRICT_NAMES_BY_ID = {
+            "1": "Innenstadt",
+            "2": "Rodenkirchen",
+            "3": "Lindenthal",
+            "4": "Ehrenfeld",
+            "5": "Nippes",
+            "6": "Chorweiler",
+            "7": "Porz",
+            "8": "Kalk",
+            "9": "Mülheim"
+        }
+
+        // *************************************************************
+        // event listener (on start)
+        // *************************************************************
+        document.addEventListener('init', function(event) 
+        {
+            // document.querySelector('ons-modal').show();
+
+            if(event.target.matches('#map_section')) 
+            {
+                load_tree_data(function()
+                {
+                    console.log("---- data loaded ----");
+                    build_district_selection_grid(function()
+                    {
+                        add_navigation_elements_event_handler();
+                        display_map_data();
+                    });
+                });
+            }
+        });
+
+        // *************************************************************
+        // event listener: navigation elements
+        // *************************************************************
+        function add_navigation_elements_event_handler()
+        {
+            var checkbox_selector_district_borders = document.querySelector("#nav_show_district_borders");
+            DISPLAY_DISTRICT_BORDERS = checkbox_selector_district_borders.checked;
+            
+            // add event
+            checkbox_selector_district_borders.addEventListener('click', function()
+            {
+                DISPLAY_DISTRICT_BORDERS = this.checked;
+                toogle_display_district_polygons();
+            });
+            
+            var checkbox_selector_district_tree_display = document.querySelectorAll('.nav_district_trees_checkbox')
+            for (var i = 0; i < checkbox_selector_district_tree_display.length; i++) 
+            {
+                // init display of trees in districts
+                if(checkbox_selector_district_tree_display[i].getAttribute("checked") != null) 
+                    DISPLAY_TREES_DISTRICTS.push(checkbox_selector_district_tree_display[i].getAttribute("data-district"));
+
+                // add event
+                checkbox_selector_district_tree_display[i].addEventListener('click', function()
+                {
+                    if(this.checked == true)
+                    {
+                        DISPLAY_TREES_DISTRICTS.push(this.getAttribute("data-district"))
+                    }
+                    else  // remove de-selected from global list
+                    {
+                        for(var i = 0; i < DISPLAY_TREES_DISTRICTS.length; i++)
+                            if(DISPLAY_TREES_DISTRICTS[i] === this.getAttribute("data-district"))
+                                DISPLAY_TREES_DISTRICTS.splice(i, 1); 
+                    }
+                    toogle_display_trees_district();
+                });
+            }
+        }
+
+        // **************************************************************
+        // navigation elements
+        // **************************************************************
+        function build_district_selection_grid(callback)
+        {
+            j=-1
+            for(var i in SUBURB_LIST)
+            {
+                if(i%3 == 0)
+                {
+                    j++;
+                    var tmp_list = $('<ons-col><ons-list></ons-list></ons-col>');
+                    $("ons-list", tmp_list).attr("id", "nav_district_trees_grid_" + j);
+                    $("#nav_selected_districts_container").append(tmp_list);
+                }
+                
+                var tmp_checked = "";
+                if(["1"].includes(SUBURB_LIST[i]))  // Innenstadt
+                    tmp_checked = "checked";
+
+                var tmp_element = 
+                $('<ons-list-item tappable>\
+                    <label class="left">\
+                        <ons-checkbox data-district="' + SUBURB_LIST[i] + '" class="nav_district_trees_checkbox" input-id="nav_district_trees_element_' + i + '" ' + tmp_checked + '></ons-checkbox>\
+                    </label>\
+                    <label for="nav_district_trees_element_' + i + '" class="center">' + DISTRICT_NAMES_BY_ID[SUBURB_LIST[i]] + '</label>\
+                </ons-list-item>');
+
+                $("#nav_district_trees_grid_" + j).append(tmp_element)
+            }
+            callback()
+        }
+
+        // **************************************************************
+        //
+        // **************************************************************
+        function load_tree_data(callback)
+        {
+            var count = 0;
+
+            // loading a zip file with a progress callback
+            JSZipUtils.getBinaryContent("src/data/app_data.zip", 
+            {
+                progress: function (e) {
+                    // console.log(event.percent + "% of " + event.path+ " loaded")
+                },
+                callback: function (err, data) 
+                {
+                    if(err) {
+                        throw err; // or handle the error
+                    }
+                    var zip = new JSZip();
+                    zip.loadAsync(data).then(function(contents) 
+                    {
+                        Object.keys(contents.files).forEach(function(filename) 
+                        {
+                            zip.file(filename).async('string').then(function(content) 
+                            {
+                                if(filename == "trees_cologne_2017.jsonl")
+                                {
+                                    tree_data_lines = content.split("\n");
+                                    for(var i in tree_data_lines)
+                                    {
+                                        try 
+                                        {
+                                            var tree_data = JSON.parse(tree_data_lines[i]);
+                                        
+                                            var tree_id = tree_data.tree_id;
+                                            var lat = tree_data.geo_info.lat;
+                                            var lng = tree_data.geo_info.lng;
+                                            
+                                            var district_number = tree_data.base_info.district_number;
+                                            if(district_number == null)
+                                                continue;
+                                            district_number = district_number.toString();
+                                            
+                                            var age_group = tree_data.tree_info.age_group_2020;
+                                            if(age_group == null)
+                                                age_group = 4;
+                                            
+                                            if(TREE_MAP_FEATURES[district_number] == null)
+                                                TREE_MAP_FEATURES[district_number] = []
+                                            
+                                            var tree_feature = 
+                                            {
+                                                "type": "Feature",
+                                                "geometry": 
+                                                {
+                                                    "type": "Point",
+                                                    "coordinates": [lng, lat]
+                                                },
+                                                "properties": 
+                                                {
+                                                    "id": tree_id,
+                                                    "age_group": age_group
+                                                }
+                                            }
+
+                                            TREE_DATA_BY_ID[tree_id] = tree_data;
+                                            TREE_MAP_FEATURES[district_number].push(tree_feature);
+                                        }
+                                        catch {}
+                                    }
+                                    count++;
+                                    if(count==2)
+                                        //do_stuff();
+                                        callback()
+                                }
+                                if(filename == "cologne_districts_polygons.json")
+                                {
+                                    var district_data = JSON.parse(content).features;
+                                    for(var i in district_data)
+                                    {
+                                        tmp = {
+                                            "type": "Feature",
+                                            "geometry": 
+                                            {
+                                                "type": "Polygon",
+                                                "coordinates": district_data[i].geometry.rings
+                                            },
+                                            "properties": {
+                                                "id": district_data[i].attributes.NR_STADTBEZIRK,
+                                                "title": district_data[i].attributes.STADTBEZIRK
+                                            }
+                                        }
+                                        DISTRICT_MAP_FEATURES.push(tmp)
+
+                                        if(SUBURB_LIST.includes(district_data[i].attributes.NR_STADTBEZIRK) == false)
+                                            SUBURB_LIST.push(district_data[i].attributes.NR_STADTBEZIRK);
+                                    }
+                                    count++;
+                                    if(count==2)
+                                        // do_stuff();
+                                        callback()
+                                }
+                            })
+                        })
+                    })
+                }
+            });
+        }
+
+        // **************************************************************
+        //
+        // **************************************************************
+        function init_map()
+        {
+            mapboxgl.accessToken = 'pk.eyJ1IjoienVzaGljYXQiLCJhIjoiY2p1Y2o0bGR6MGNnZjRka2IzcmNraGtyZSJ9.wBS9jxpUT9vWhsCiWF_z5w';
+            
+            // *********
+            // init map
+            MAP = new mapboxgl.Map(
+            {
+                container: 'tree_map',
+                style: 'mapbox://styles/zushicat/ckbcadygg11ao1irxsfxy1jzx', // stylesheet location
+                center: [6.953101, 50.935173], // starting position [lng, lat]
+                zoom: 11 // starting zoom
+            });
+
+            // *********
+            // add geoccoder search
+            MAP.addControl(new MapboxGeocoder(
+            {
+                accessToken: mapboxgl.accessToken,
+                countries: 'de',  // limit results to Australia
+                bbox: [6.731135, 50.860533, 7.225520, 51.032067],  // further limit results to geographic bounds
+                
+                // apply a client side filter to further limit results to those strictly within
+                // the New South Wales region
+                filter: function(item) 
+                {
+                    // console.log(item)
+                    // returns true if item contains New South Wales region
+                    return item.context.map(function(i) {
+                        // id is in the form {index}.{id} per https://github.com/mapbox/carmen/blob/master/carmen-geojson.md
+                        // this example attempts to find the `region` named `New South Wales`
+                        return (
+                            i.id.split('.').shift() === 'region' &&
+                            i.text === 'Nordrhein-Westfalen'
+                        );
+                    }).reduce(function(acc, cur) 
+                    {
+                        return acc || cur;
+                    });
+                },
+                mapboxgl: mapboxgl
+            }));
+        }
+
+        // **************************************************************
+        //
+        // **************************************************************
+        function create_tree_layer()
+        {
+            for(var district_number in TREE_MAP_FEATURES)
+            {
+                if(district_number == null)
+                    continue
+                
+                MAP.addSource('trees_' + district_number, 
+                {
+                    'type': 'geojson',
+                    'data': 
+                    {
+                        'type': 'FeatureCollection',
+                        'features': TREE_MAP_FEATURES[district_number]
+                    }
+                });
+
+                // init visibility
+                var layer_visibility = "none";
+                if(DISPLAY_TREES_DISTRICTS.includes(district_number) == true)
+                    layer_visibility = "visible";
+
+                MAP.addLayer(
+                {
+                    "id": 'all_trees_layer_' + district_number,
+                    "type": 'circle',
+                    "source": 'trees_' + district_number,
+                    "paint": 
+                    {
+                        'circle-radius': {
+                            'base': 1.75,
+                            'stops': [
+                                [12, 1],
+                                [22, 100]
+                            ]
+                        },
+                        //'circle-color': "#3db023",
+                        // color circles by age_group of trees, using a match expression
+                        // https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-match
+                        'circle-color': [
+                        'match',
+                        ['get', 'age_group'],
+                        0,
+                        "#67f500",
+                        1,
+                        "#5dde00",
+                        2,
+                        "#54c900",
+                        3,
+                        "#3e9400",
+                        /* other */ "#b4db97"
+                        ]
+                    },
+                    'layout': 
+                    {
+                        'visibility': layer_visibility
+                    },
+                });
+            }
+        }
+
+        function create_district_polygon_layer()
+        {
+            // MAP.on('load', function() 
+            // {
+                MAP.addSource('districts', 
+                {
+                    'type': 'geojson',
+                    'data': 
+                    {
+                        'type': 'FeatureCollection',
+                        'features': DISTRICT_MAP_FEATURES
+                    }
+                });
+
+                // init visibility
+                var layer_visibility = "none";
+                if(DISPLAY_DISTRICT_BORDERS == true)
+                    layer_visibility = "visible";
+
+                MAP.addLayer(
+                {
+                    'id': 'districts_layer',
+                    'type': 'line',
+                    'source': 'districts',
+                    'layout': 
+                    {
+                        // make layer visible by default
+                        'visibility': layer_visibility,
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    'paint': {
+                    'line-color': '#828282',
+                    'line-width': 1
+                    }
+                });
+            // });
+        }
+        
+        
+        // **************************************************************
+        // toggle map display from selection
+        // **************************************************************
+        function toogle_display_district_polygons()
+        {
+            var map_layer_id = "districts_layer";
+            
+            if(DISPLAY_DISTRICT_BORDERS == false)
+                MAP.setLayoutProperty(map_layer_id, "visibility", "none");
+            else 
+                MAP.setLayoutProperty(map_layer_id, "visibility", "visible");
+        }
+
+        function toogle_display_trees_district()
+        {
+            var map_layer = MAP.getStyle().layers;
+
+            for(var i in map_layer)
+            {
+                if(map_layer[i].id.indexOf("all_trees_layer_") == -1)
+                    continue
+                
+                var current_district_num = map_layer[i].id.replace("all_trees_layer_", "");
+                if(DISPLAY_TREES_DISTRICTS.includes(current_district_num))
+                    MAP.setLayoutProperty(map_layer[i].id, "visibility", "visible");
+                else
+                    MAP.setLayoutProperty(map_layer[i].id, "visibility", "none");
+            }
+            // for(var i in DISPLAY_TREES_DISTRICTS)
+            // {
+            //     var map_layer_id = "all_trees_layer_" + DISPLAY_TREES_DISTRICTS[i];
+            //     MAP.setLayoutProperty(map_layer_id, "visibility", "visible");
+            // }
+        }
+
+        // **************************************************************
+        //
+        // **************************************************************
+        function display_map_data()
+        {
+            console.log("---- do map stuff ----");
+            // console.log(TREE_MAP_FEATURES)
+            init_map();
+
+            MAP.on('load', function() 
+            {
+                create_district_polygon_layer();
+                create_tree_layer();
+
+                MAP.on('sourcedata', function(e) 
+                {
+                    show_modal = e.isSourceLoaded;
+                    if (e.isSourceLoaded) 
+                    {
+                        console.log("----> HIDE MODAL");
+                        // document.querySelector('ons-modal').hide();
+                    }
+                    else
+                    {
+                        console.log("----> SHOW MODAL");
+                        // document.querySelector('ons-modal').show();
+                    }
+                });
+            });
+            
+            
+        }
+    </script>
+</body>
