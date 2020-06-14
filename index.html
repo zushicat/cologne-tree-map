@@ -70,15 +70,62 @@
     </ons-modal>
 
     <!-- ************************************* -->
+    <!-- splitter -->
+    <!-- ************************************* -->
+    <ons-splitter>
+        <ons-splitter-side id="menu" side="left" width="50%" collapse swipeable>
+          <ons-page>
+            
+            <div class="content_container" id="map_interaction_container">
+                <ons-list>
+                    <!-- ***** -->
+                    <ons-list-item tappable>
+                        <label class="left">
+                            <ons-checkbox input-id="nav_show_district_borders" checked></ons-checkbox>
+                        </label>
+                        <label for="nav_show_district_borders" class="center">
+                            Show Borders of Suburbs
+                        </label>
+                    </ons-list-item>
+                    
+                    <!-- ***** -->
+                    <ons-list-item tappable expandable>
+                        Show trees in selected districts
+                        <div class="expandable-content">
+                            <!-- dynamically created district list as 3x3 grid: build_district_selection_grid() -->
+                            <!-- hardcoded in fct: start with restricted tree display of Innenstadt and Ehrendfeld -->
+                            <ons-row id="nav_selected_districts_container"></ons-row>
+                        </div>
+                    </ons-list-item>
+                </ons-list>
+            </div>
+
+          </ons-page>
+        </ons-splitter-side>
+        <ons-splitter-content id="map_page" page="map_page.html"></ons-splitter-content>
+      </ons-splitter>
+
+    <!-- ************************************* -->
     <!-- start navigator -->
     <!-- ************************************* -->
-    <ons-navigator id="myNavigator" page="map_section.html"></ons-navigator>
+    <!-- <ons-navigator id="myNavigator" page="map_section.html"></ons-navigator> -->
 
     <!-- ************************************* -->
     <!-- map section -->
     <!-- ************************************* -->
-    <template id="map_section.html">
-        <ons-page id="map_section">
+    <template id="map_page.html">
+        <ons-page id="map_page">
+            <ons-toolbar>
+                <div class="left">
+                    <ons-toolbar-button onclick="fn.open()">
+                        <ons-icon icon="md-menu"></ons-icon>
+                    </ons-toolbar-button>
+                </div>
+                <div class="center">
+                    Main
+                </div>
+            </ons-toolbar>
+
             <div class="content_container">
                 <h1>Cologne Tree Map</h1>
                 <p>
@@ -91,9 +138,9 @@
             <!-- elements for map interaction -->
             <!-- ****************************** -->
             <div id="map_stuff">
-                <div class="content_container" id="map_interaction_container">
+                <!-- move navigation to splitter -->
+                <!-- <div class="content_container" id="map_interaction_container">
                     <ons-list>
-                        <!-- ***** -->
                         <ons-list-item tappable>
                             <label class="left">
                                 <ons-checkbox input-id="nav_show_district_borders" checked></ons-checkbox>
@@ -103,19 +150,17 @@
                             </label>
                         </ons-list-item>
                         
-                        <!-- ***** -->
                         <ons-list-item tappable expandable>
                             Show trees in selected districts
                             <div class="expandable-content">
-                                <!-- dynamically created district list as 3x3 grid: build_district_selection_grid() -->
-                                <!-- hardcoded in fct: start with restricted tree display of Innenstadt and Ehrendfeld -->
                                 <ons-row id="nav_selected_districts_container"></ons-row>
                             </div>
                         </ons-list-item>
                     </ons-list>
-                    
-                    <nav id="menu"></nav>
-                </div>
+                </div> -->
+                
+                <nav id="menu"></nav>
+                
             </div>
 
             <div id="tree_map"></div>
@@ -151,13 +196,33 @@
         }
 
         // *************************************************************
+        // side menu
+        // *************************************************************
+        window.fn = {};
+
+        window.fn.open = function() 
+        {
+            var menu = document.getElementById('menu');
+            menu.open();
+        };
+
+        window.fn.load = function(page) 
+        {
+            var content = document.getElementById('map_page');
+            var menu = document.getElementById('menu');
+            
+            content.load(page).then(menu.close.bind(menu));
+        };
+
+        // *************************************************************
         // event listener (on start)
         // *************************************************************
         document.addEventListener('init', function(event) 
         {
             // document.querySelector('ons-modal').show();
+            // console.log(event.target)
 
-            if(event.target.matches('#map_section')) 
+            if(event.target.matches('#map_page')) 
             {
                 load_tree_data(function()
                 {
@@ -545,7 +610,7 @@
         function display_map_data()
         {
             console.log("---- do map stuff ----");
-            // console.log(TREE_MAP_FEATURES)
+            
             init_map();
 
             MAP.on('load', function() 
@@ -558,12 +623,12 @@
                     show_modal = e.isSourceLoaded;
                     if (e.isSourceLoaded) 
                     {
-                        console.log("----> HIDE MODAL");
+                        // console.log("----> HIDE MODAL");
                         // document.querySelector('ons-modal').hide();
                     }
                     else
                     {
-                        console.log("----> SHOW MODAL");
+                        // console.log("----> SHOW MODAL");
                         // document.querySelector('ons-modal').show();
                     }
                 });
