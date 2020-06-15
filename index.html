@@ -97,6 +97,45 @@
                             <ons-row id="nav_selected_districts_container"></ons-row>
                         </div>
                     </ons-list-item>
+
+                    <!-- ***** -->
+                    <ons-row>
+                        <ons-col>
+                            <label class="left">
+                                <ons-checkbox data-agegroup="0" class="nav_age_group_checkbox" input-id="nav_filter_age_group_0" checked></ons-checkbox>
+                            </label>
+                            <label for="nav_filter_age_group_0" class="center">
+                                1 - 5
+                        </ons-col>
+                        <ons-col>
+                            <label class="left">
+                                <ons-checkbox data-agegroup="1" class="nav_age_group_checkbox" input-id="nav_filter_age_group_1" checked></ons-checkbox>
+                            </label>
+                            <label for="nav_filter_age_group_1" class="center">
+                                6 - 15
+                        </ons-col>
+                        <ons-col>
+                            <label class="left">
+                                <ons-checkbox data-agegroup="2" class="nav_age_group_checkbox" input-id="nav_filter_age_group_2" checked></ons-checkbox>
+                            </label>
+                            <label for="nav_filter_age_group_2" class="center">
+                                16 - 39
+                        </ons-col>
+                        <ons-col>
+                            <label class="left">
+                                <ons-checkbox data-agegroup="3" class="nav_age_group_checkbox" input-id="nav_filter_age_group_3" checked></ons-checkbox>
+                            </label>
+                            <label for="nav_filter_age_group_3" class="center">
+                                > 40
+                        </ons-col>
+                        <ons-col>
+                            <label class="left">
+                                <ons-checkbox data-agegroup="4" class="nav_age_group_checkbox" input-id="nav_filter_age_group_4" checked></ons-checkbox>
+                            </label>
+                            <label for="nav_filter_age_group_4" class="center">
+                                unknown
+                        </ons-col>
+                    </ons-row>
                 </ons-list>
             </div>
 
@@ -181,6 +220,7 @@
 
         var DISPLAY_DISTRICT_BORDERS = false;
         var DISPLAY_TREES_DISTRICTS = [];
+        var DISPLAY_AGE_GROUPS = [];
 
         var DISTRICT_NAMES_BY_ID = {
             "1": "Innenstadt",
@@ -240,6 +280,9 @@
         // *************************************************************
         function add_navigation_elements_event_handler()
         {
+            // **********
+            // toggle district border display
+            // **********
             var checkbox_selector_district_borders = document.querySelector("#nav_show_district_borders");
             DISPLAY_DISTRICT_BORDERS = checkbox_selector_district_borders.checked;
             
@@ -250,6 +293,9 @@
                 toogle_display_district_polygons();
             });
             
+            // **********
+            // toggle district display
+            // **********
             var checkbox_selector_district_tree_display = document.querySelectorAll('.nav_district_trees_checkbox')
             for (var i = 0; i < checkbox_selector_district_tree_display.length; i++) 
             {
@@ -266,11 +312,37 @@
                     }
                     else  // remove de-selected from global list
                     {
-                        for(var i = 0; i < DISPLAY_TREES_DISTRICTS.length; i++)
-                            if(DISPLAY_TREES_DISTRICTS[i] === this.getAttribute("data-district"))
-                                DISPLAY_TREES_DISTRICTS.splice(i, 1); 
+                        for(var j = 0; j < DISPLAY_TREES_DISTRICTS.length; j++)
+                            if(DISPLAY_TREES_DISTRICTS[j] === this.getAttribute("data-district"))
+                                DISPLAY_TREES_DISTRICTS.splice(j, 1); 
                     }
                     toogle_display_trees_district();
+                });
+            }
+
+            // **********
+            // filter age group display
+            // **********
+            var checkbox_selector_age_group_display = document.querySelectorAll('.nav_age_group_checkbox')
+            for (var i = 0; i < checkbox_selector_age_group_display.length; i++) 
+            {
+                // init
+                if(checkbox_selector_age_group_display[i].getAttribute("checked") != null) 
+                    DISPLAY_AGE_GROUPS.push(checkbox_selector_age_group_display[i].getAttribute("data-agegroup"));
+                
+                checkbox_selector_age_group_display[i].addEventListener('click', function()
+                {
+                    if(this.checked == true)
+                    {
+                        DISPLAY_AGE_GROUPS.push(this.getAttribute("data-agegroup"))
+                    }
+                    else  // remove de-selected from global list
+                    {
+                        for(var j = 0; j < DISPLAY_AGE_GROUPS.length; j++)
+                            if(DISPLAY_AGE_GROUPS[j] === this.getAttribute("data-agegroup"))
+                                DISPLAY_AGE_GROUPS.splice(j, 1); 
+                    }
+                    filter_display_age_groups();
                 });
             }
         }
@@ -604,6 +676,22 @@
         }
 
         // **************************************************************
+        // filter selection
+        // **************************************************************
+        function filter_display_age_groups()
+        {
+            var tmp_filtered = [];
+            for(var i in DISPLAY_AGE_GROUPS)
+                tmp_filtered.push(parseInt(DISPLAY_AGE_GROUPS[i]))
+            
+            for(var i in SUBURB_LIST)
+            {
+                var tmp_layer = "all_trees_layer_" + SUBURB_LIST[i]
+                MAP.setFilter(tmp_layer, ['match', ['get', 'age_group'], tmp_filtered, true, false]);
+            }
+        }
+
+        // **************************************************************
         //
         // **************************************************************
         function display_map_data()
@@ -632,8 +720,6 @@
                     }
                 });
             });
-            
-            
         }
     </script>
 </body>
