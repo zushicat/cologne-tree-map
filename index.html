@@ -405,7 +405,7 @@
                         {
                             zip.file(filename).async('string').then(function(content) 
                             {
-                                if(filename == "trees_cologne_2017.jsonl")
+                                if(filename == "trees_cologne_merged.jsonl")
                                 {
                                     tree_data_lines = content.split("\n");
                                     for(var i in tree_data_lines)
@@ -423,7 +423,13 @@
                                                 continue;
                                             district_number = district_number.toString();
                                             
-                                            var age_group = tree_data.tree_info.age_group_2020;
+                                            // *****
+                                            // age
+                                            var age_group = null;
+                                            if(tree_data.tree_age.age_group_2020 != null)
+                                                age_group = tree_data.tree_age.age_group_2020;
+                                            else
+                                                age_group = tree_data.predictions.age_prediction.age_group_2020;
                                             if(age_group == null)
                                                 age_group = 4;
                                             
