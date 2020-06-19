@@ -8,4 +8,4 @@ __pycache__/
 .vscode/
 
 cologne_districts_polygons.json
-trees_cologne_2017.jsonl
+trees_cologne_merged.jsonl
