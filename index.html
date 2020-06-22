@@ -405,7 +405,7 @@
                         {
                             zip.file(filename).async('string').then(function(content) 
                             {
-                                if(filename == "trees_cologne_merged.jsonl")
+                                if(filename == "trees_cologne_merged_reduced.jsonl")
                                 {
                                     tree_data_lines = content.split("\n");
                                     for(var i in tree_data_lines)
@@ -415,10 +415,13 @@
                                             var tree_data = JSON.parse(tree_data_lines[i]);
                                         
                                             var tree_id = tree_data.tree_id;
-                                            var lat = tree_data.geo_info.lat;
-                                            var lng = tree_data.geo_info.lng;
+                                            var lat = tree_data.lat;
+                                            var lng = tree_data.lng;
+
+                                            var genus = tree_data.genus;
+                                            var in_dataset_2020 = tree_data.in_dataset_2020
                                             
-                                            var district_number = tree_data.base_info.district_number;
+                                            var district_number = tree_data.district_number;
                                             if(district_number == null)
                                                 continue;
                                             district_number = district_number.toString();
@@ -426,12 +429,10 @@
                                             // *****
                                             // age
                                             var age_group = null;
-                                            if(tree_data.tree_age.age_group_2020 != null)
-                                                age_group = tree_data.tree_age.age_group_2020;
+                                            if(tree_data.age_group != null)
+                                                age_group = tree_data.age_group;
                                             else
-                                                age_group = tree_data.predictions.age_prediction.age_group_2020;
-                                            if(age_group == null)
-                                                age_group = 4;
+                                                age_group = 3;  // unknown
                                             
                                             if(TREE_MAP_FEATURES[district_number] == null)
                                                 TREE_MAP_FEATURES[district_number] = []
@@ -447,18 +448,19 @@
                                                 "properties": 
                                                 {
                                                     "id": tree_id,
-                                                    "age_group": age_group
+                                                    "age_group": age_group,
+                                                    "genus": genus,
+                                                    "in_dataset_2020": in_dataset_2020
                                                 }
                                             }
 
                                             TREE_DATA_BY_ID[tree_id] = tree_data;
                                             TREE_MAP_FEATURES[district_number].push(tree_feature);
                                         }
-                                        catch {}
+                                        catch { console.log("!!!!") }
                                     }
                                     count++;
                                     if(count==2)
-                                        //do_stuff();
                                         callback()
                                 }
                                 if(filename == "cologne_districts_polygons.json")
@@ -485,7 +487,6 @@
                                     }
                                     count++;
                                     if(count==2)
-                                        // do_stuff();
                                         callback()
                                 }
                             })
