@@ -32,6 +32,10 @@
     <script src="lib/jszip/jszip.min.js"></script>
     <script src="lib/jszip/jszip-utils.min.js"></script>
 
+    <!-- ! TMP ! client-sided utm -> lat/lng projection -->
+    <!-- https://stackoverflow.com/a/18621244 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.6.2/proj4.js"></script>
+
     <style>
         /* ************************** */
         /* page */
@@ -89,7 +93,7 @@
                     </ons-list-item>
                     
                     <!-- ***** -->
-                    <ons-list-item tappable expandable>
+                    <ons-list-item id="nav_district_button_list_container" tappable expandable>
                         Show trees in selected districts
                         <div class="expandable-content">
                             <!-- dynamically created district list as 3x3 grid: build_district_selection_grid() -->
@@ -112,20 +116,27 @@
                                 <ons-checkbox data-agegroup="1" class="nav_age_group_checkbox" input-id="nav_filter_age_group_1" checked></ons-checkbox>
                             </label>
                             <label for="nav_filter_age_group_1" class="center">
-                                17 - 40
+                                18 - 25
                         </ons-col>
                         <ons-col>
                             <label class="left">
                                 <ons-checkbox data-agegroup="2" class="nav_age_group_checkbox" input-id="nav_filter_age_group_2" checked></ons-checkbox>
                             </label>
                             <label for="nav_filter_age_group_2" class="center">
-                                > 40
+                                26 - 40
                         </ons-col>
                         <ons-col>
                             <label class="left">
                                 <ons-checkbox data-agegroup="3" class="nav_age_group_checkbox" input-id="nav_filter_age_group_3" checked></ons-checkbox>
                             </label>
                             <label for="nav_filter_age_group_3" class="center">
+                                > 40
+                        </ons-col>
+                        <ons-col>
+                            <label class="left">
+                                <ons-checkbox data-agegroup="4" class="nav_age_group_checkbox" input-id="nav_filter_age_group_4" checked></ons-checkbox>
+                            </label>
+                            <label for="nav_filter_age_group_4" class="center">
                                 unknown
                         </ons-col>
                     </ons-row>
@@ -273,6 +284,11 @@
         // *************************************************************
         function add_navigation_elements_event_handler()
         {
+            // **********
+            // expandabale list for districts is default expanded
+            // **********
+            document.querySelector("#nav_district_button_list_container").showExpansion()
+
             // **********
             // toggle district border display
             // **********
@@ -425,7 +441,7 @@
                                             if(tree_data.age_group != null)
                                                 age_group = tree_data.age_group;
                                             else
-                                                age_group = 3;  // unknown
+                                                age_group = 4;  // unknown
                                             
                                             if(TREE_MAP_FEATURES[district_number] == null)
                                                 TREE_MAP_FEATURES[district_number] = []
@@ -458,25 +474,35 @@
                                 }
                                 if(filename == "cologne_districts_polygons.json")
                                 {
-                                    var district_data = JSON.parse(content).features;
-                                    for(var i in district_data)
+                                    var suburb_data = JSON.parse(content).features;
+                                    
+                                    for(var i in suburb_data)
                                     {
+                                        var suburb_id = suburb_data[i].properties.NUMMER;
+                                        var suburb_name = suburb_data[i].properties.NAME;
+
+                                        var district_id = suburb_data[i].properties.NR_STADTBEZIRK;
+                                        var district_name = suburb_data[i].properties.STADTBEZIRK;
+
+                                        var coordinates = suburb_data[i].geometry.coordinates;
+                                        
+                                        
                                         tmp = {
                                             "type": "Feature",
                                             "geometry": 
                                             {
                                                 "type": "Polygon",
-                                                "coordinates": district_data[i].geometry.rings
+                                                "coordinates": coordinates
                                             },
                                             "properties": {
-                                                "id": district_data[i].attributes.NR_STADTBEZIRK,
-                                                "title": district_data[i].attributes.STADTBEZIRK
+                                                "id": district_id,
+                                                "title": district_name
                                             }
                                         }
                                         DISTRICT_MAP_FEATURES.push(tmp)
-
-                                        if(SUBURB_LIST.includes(district_data[i].attributes.NR_STADTBEZIRK) == false)
-                                            SUBURB_LIST.push(district_data[i].attributes.NR_STADTBEZIRK);
+                                        
+                                        if(SUBURB_LIST.includes(district_id) == false)
+                                            SUBURB_LIST.push(district_id);
                                     }
                                     count++;
                                     if(count==2)
@@ -503,7 +529,7 @@
                 container: 'tree_map',
                 style: 'mapbox://styles/zushicat/ckbcadygg11ao1irxsfxy1jzx', // stylesheet location
                 center: [6.953101, 50.935173], // starting position [lng, lat]
-                zoom: 11 // starting zoom
+                zoom: 13 // starting zoom
             });
 
             // *********
@@ -582,13 +608,15 @@
                         'match',
                         ['get', 'age_group'],
                         0,
-                        "#88ff38",
+                        "#c3eb34",
                         1,
-                        "#6ccc2b",
+                        "#7aeb34",
                         2,
-                        "#56a322",
+                        "#2ed93c",
                         3,
-                        "#575757",
+                        "#20b345", 
+                        4,
+                        "#575757", 
                         /* other */ "#ff0000"
                         ]
                     },
@@ -632,7 +660,7 @@
                         'line-cap': 'round'
                     },
                     'paint': {
-                    'line-color': '#828282',
+                    'line-color': '#fc8403',
                     'line-width': 1
                     }
                 });
