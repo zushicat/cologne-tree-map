@@ -103,43 +103,69 @@
                     </ons-list-item>
 
                     <!-- ***** -->
-                    <ons-row>
-                        <ons-col>
-                            <label class="left">
-                                <ons-checkbox data-agegroup="0" class="nav_age_group_checkbox" input-id="nav_filter_age_group_0" checked></ons-checkbox>
-                            </label>
-                            <label for="nav_filter_age_group_0" class="center">
-                                10 - 17
-                        </ons-col>
-                        <ons-col>
-                            <label class="left">
-                                <ons-checkbox data-agegroup="1" class="nav_age_group_checkbox" input-id="nav_filter_age_group_1" checked></ons-checkbox>
-                            </label>
-                            <label for="nav_filter_age_group_1" class="center">
-                                18 - 25
-                        </ons-col>
-                        <ons-col>
-                            <label class="left">
-                                <ons-checkbox data-agegroup="2" class="nav_age_group_checkbox" input-id="nav_filter_age_group_2" checked></ons-checkbox>
-                            </label>
-                            <label for="nav_filter_age_group_2" class="center">
-                                26 - 40
-                        </ons-col>
-                        <ons-col>
-                            <label class="left">
-                                <ons-checkbox data-agegroup="3" class="nav_age_group_checkbox" input-id="nav_filter_age_group_3" checked></ons-checkbox>
-                            </label>
-                            <label for="nav_filter_age_group_3" class="center">
-                                > 40
-                        </ons-col>
-                        <ons-col>
-                            <label class="left">
-                                <ons-checkbox data-agegroup="4" class="nav_age_group_checkbox" input-id="nav_filter_age_group_4" checked></ons-checkbox>
-                            </label>
-                            <label for="nav_filter_age_group_4" class="center">
-                                unknown
-                        </ons-col>
-                    </ons-row>
+                    <ons-list-item tappable>
+                        <ons-row>
+                            <ons-col>
+                                <label class="left">
+                                    <ons-checkbox data-agegroup="0" class="nav_age_group_checkbox" input-id="nav_filter_age_group_0" checked></ons-checkbox>
+                                </label>
+                                <label for="nav_filter_age_group_0" class="center">
+                                    < 26
+                                </label>
+                            </ons-col>
+                            <ons-col>
+                                <label class="left">
+                                    <ons-checkbox data-agegroup="1" class="nav_age_group_checkbox" input-id="nav_filter_age_group_1" checked></ons-checkbox>
+                                </label>
+                                <label for="nav_filter_age_group_1" class="center">
+                                    26-40
+                                </label>
+                            </ons-col>
+                            <ons-col>
+                                <label class="left">
+                                    <ons-checkbox data-agegroup="2" class="nav_age_group_checkbox" input-id="nav_filter_age_group_2" checked></ons-checkbox>
+                                </label>
+                                <label for="nav_filter_age_group_2" class="center">
+                                    > 40
+                                </label>
+                            </ons-col>
+                            <ons-col>
+                                <label class="left">
+                                    <ons-checkbox data-agegroup="3" class="nav_age_group_checkbox" input-id="nav_filter_age_group_3" checked></ons-checkbox>
+                                </label>
+                                <label for="nav_filter_age_group_3" class="center">
+                                    unknown
+                                </label>
+                            </ons-col>
+                        </ons-row>
+                    </ons-list-item>
+
+                    <!-- ***** -->
+                    <ons-list-item tappable>
+                        <p>bla bla</p>
+                    </ons-list-item>
+                
+                    <!-- ***** -->
+                    <ons-list-item tappable>
+                        <ons-row>
+                            <ons-col tappable>
+                                <label class="left">
+                                    <ons-radio name="nav_switch_map_style" value="streets" input-id="nav_switch_map_style_streets" checked></ons-radio>
+                                </label>
+                                <label for="nav_switch_map_style_streets" class="center">
+                                    Streets
+                                </label>
+                            </ons-col>
+                            <ons-col tappable>
+                                <label class="left">
+                                    <ons-radio name="nav_switch_map_style" value="satellite" input-id="nav_switch_map_style_satellite"></ons-radio>
+                                </label>
+                                <label for="nav_switch_map_style_streets" class="center">
+                                    Satellite
+                                </label>
+                            </ons-col>
+                        </ons-row>
+                    </ons-list-item>
                 </ons-list>
             </div>
 
@@ -176,35 +202,7 @@
                 </p>
             </div>
 
-            <!-- ****************************** -->
-            <!-- elements for map interaction -->
-            <!-- ****************************** -->
-            <div id="map_stuff">
-                <!-- move navigation to splitter -->
-                <!-- <div class="content_container" id="map_interaction_container">
-                    <ons-list>
-                        <ons-list-item tappable>
-                            <label class="left">
-                                <ons-checkbox input-id="nav_show_district_borders" checked></ons-checkbox>
-                            </label>
-                            <label for="nav_show_district_borders" class="center">
-                                Show Borders of Suburbs
-                            </label>
-                        </ons-list-item>
-                        
-                        <ons-list-item tappable expandable>
-                            Show trees in selected districts
-                            <div class="expandable-content">
-                                <ons-row id="nav_selected_districts_container"></ons-row>
-                            </div>
-                        </ons-list-item>
-                    </ons-list>
-                </div> -->
-                
-                <nav id="menu"></nav>
-                
-            </div>
-
+            
             <div id="tree_map"></div>
         </ons-page>
     </template>
@@ -330,6 +328,22 @@
             }
 
             // **********
+            // switch map style
+            // **********
+            var bla = document.querySelectorAll('input[name="nav_switch_map_style"]')
+            for (var i = 0; i < bla.length; i++) 
+            {
+                bla[i].addEventListener('click', function()
+                {
+                    console.log(this.value);
+                    if(this.value == "satellite")
+                        MAP.setStyle("mapbox://styles/mapbox/satellite-v9");
+                    else
+                        MAP.setStyle("mapbox://styles/zushicat/ckbcadygg11ao1irxsfxy1jzx")
+                })
+            };
+
+            // **********
             // filter age group display
             // **********
             var checkbox_selector_age_group_display = document.querySelectorAll('.nav_age_group_checkbox')
@@ -441,7 +455,7 @@
                                             if(tree_data.age_group != null)
                                                 age_group = tree_data.age_group;
                                             else
-                                                age_group = 4;  // unknown
+                                                age_group = 3;  // unknown
                                             
                                             if(TREE_MAP_FEATURES[district_number] == null)
                                                 TREE_MAP_FEATURES[district_number] = []
@@ -520,6 +534,12 @@
         // **************************************************************
         function init_map()
         {
+            var baseLayers = 
+            [
+                { label: 'streets', style: "mapbox://styles/mapbox/satellite-v9" }, 
+                { label: 'satellite', style: "mapbox://styles/zushicat/ckbcadygg11ao1irxsfxy1jzx" }
+            ];
+
             mapboxgl.accessToken = 'pk.eyJ1IjoienVzaGljYXQiLCJhIjoiY2p1Y2o0bGR6MGNnZjRka2IzcmNraGtyZSJ9.wBS9jxpUT9vWhsCiWF_z5w';
             
             // *********
@@ -594,13 +614,22 @@
                     "source": 'trees_' + district_number,
                     "paint": 
                     {
-                        'circle-radius': {
-                            'base': 1.75,
-                            'stops': [
+                        "circle-radius": {
+                            "base": 1.75,
+                            "stops": [
                                 [12, 1],
                                 [22, 100]
                             ]
                         },
+                        "circle-opacity": [
+                            'interpolate',
+                            ['exponential', 0.5],
+                            ['zoom'],
+                            12,
+                            1.0,
+                            22,
+                            0.5
+                        ],
                         //'circle-color': "#3db023",
                         // color circles by age_group of trees, using a match expression
                         // https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-match
@@ -614,9 +643,7 @@
                         2,
                         "#2ed93c",
                         3,
-                        "#20b345", 
-                        4,
-                        "#575757", 
+                        "#4f96c9", 
                         /* other */ "#ff0000"
                         ]
                     },
@@ -728,7 +755,7 @@
             
             init_map();
 
-            MAP.on('load', function() 
+            MAP.on('style.load', function() 
             {
                 create_district_polygon_layer();
                 create_tree_layer();
