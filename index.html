@@ -215,7 +215,8 @@
         var MAP;
 
         var TREE_DATA_BY_ID = {};
-        var TREE_MAP_FEATURES = {};  // object of lists by district id
+        var TREE_MAP_FEATURES = {};  // object (by district if) of lists of trees
+        var CUT_TREE_MAP_FEATURES = {};  // object (by district id) of lists of cut trees
 
         var DISTRICT_MAP_FEATURES = [];
         var SUBURB_LIST = []
@@ -459,6 +460,8 @@
                                             
                                             if(TREE_MAP_FEATURES[district_number] == null)
                                                 TREE_MAP_FEATURES[district_number] = []
+                                            if(CUT_TREE_MAP_FEATURES[district_number] == null)
+                                                CUT_TREE_MAP_FEATURES[district_number] = []
                                             
                                             var tree_feature = 
                                             {
@@ -477,8 +480,16 @@
                                                 }
                                             }
 
-                                            TREE_DATA_BY_ID[tree_id] = tree_data;
-                                            TREE_MAP_FEATURES[district_number].push(tree_feature);
+                                            if(in_dataset_2020 == true)
+                                            {
+                                                TREE_DATA_BY_ID[tree_id] = tree_data;
+                                                TREE_MAP_FEATURES[district_number].push(tree_feature);
+                                            }
+                                            else
+                                            {
+                                                TREE_DATA_BY_ID[tree_id] = tree_data;
+                                                CUT_TREE_MAP_FEATURES[district_number].push(tree_feature);
+                                            }
                                         }
                                         catch { console.log("!!!!") }
                                     }
@@ -655,6 +666,62 @@
             }
         }
 
+        function create_cut_tree_layer()
+        {
+            for(var district_number in CUT_TREE_MAP_FEATURES)
+            {
+                if(district_number == null)
+                    continue
+
+                MAP.addSource('cut_trees_' + district_number, 
+                    {
+                        'type': 'geojson',
+                        'data': 
+                        {
+                            'type': 'FeatureCollection',
+                            'features': CUT_TREE_MAP_FEATURES[district_number]
+                        }
+                    });
+                
+                // init visibility
+                var layer_visibility = "none";
+                if(DISPLAY_TREES_DISTRICTS.includes(district_number) == true)
+                    layer_visibility = "visible";
+                
+                
+                MAP.addLayer(
+                {
+                    "id": "cut_trees_layer_" + district_number,
+                    "type": "circle",
+                    "source": "cut_trees_" + district_number,
+                    "paint": 
+                    {
+                        "circle-radius": {
+                            "base": 1.75,
+                            "stops": [
+                                [12, 1],
+                                [22, 100]
+                            ]
+                        },
+                        "circle-opacity": [
+                            'interpolate',
+                            ['exponential', 0.5],
+                            ['zoom'],
+                            12,
+                            1.0,
+                            22,
+                            0.5
+                        ],
+                        "circle-color": "#ff0000",
+                    },
+                    'layout': 
+                    {
+                        'visibility': layer_visibility
+                    },
+                });
+            }
+        }
+
         function create_district_polygon_layer()
         {
             // MAP.on('load', function() 
@@ -714,15 +781,28 @@
 
             for(var i in map_layer)
             {
-                if(map_layer[i].id.indexOf("all_trees_layer_") == -1)
+                if(map_layer[i].id.indexOf("all_trees_layer_") == -1 && map_layer[i].id.indexOf("cut_trees_layer_") == -1)
                     continue
                 
-                var current_district_num = map_layer[i].id.replace("all_trees_layer_", "");
-                if(DISPLAY_TREES_DISTRICTS.includes(current_district_num))
-                    MAP.setLayoutProperty(map_layer[i].id, "visibility", "visible");
-                else
-                    MAP.setLayoutProperty(map_layer[i].id, "visibility", "none");
+                if(map_layer[i].id.indexOf("all_trees_layer_") != -1)
+                {
+                    var current_district_num = map_layer[i].id.replace("all_trees_layer_", "");
+                    if(DISPLAY_TREES_DISTRICTS.includes(current_district_num))
+                        MAP.setLayoutProperty(map_layer[i].id, "visibility", "visible");
+                    else
+                        MAP.setLayoutProperty(map_layer[i].id, "visibility", "none");
+                }
+
+                if(map_layer[i].id.indexOf("cut_trees_layer_") != -1)
+                {
+                    var current_district_num = map_layer[i].id.replace("cut_trees_layer_", "");
+                    if(DISPLAY_TREES_DISTRICTS.includes(current_district_num))
+                        MAP.setLayoutProperty(map_layer[i].id, "visibility", "visible");
+                    else
+                        MAP.setLayoutProperty(map_layer[i].id, "visibility", "none");
+                }
             }
+
             // for(var i in DISPLAY_TREES_DISTRICTS)
             // {
             //     var map_layer_id = "all_trees_layer_" + DISPLAY_TREES_DISTRICTS[i];
@@ -759,6 +839,7 @@
             {
                 create_district_polygon_layer();
                 create_tree_layer();
+                create_cut_tree_layer();
 
                 MAP.on('sourcedata', function(e) 
                 {
