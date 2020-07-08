@@ -59,6 +59,34 @@
         #tree_map {
             width: 100%;
             height: 500px;
+            background-color: #ccc;
+        }
+
+        /* ************************** */
+        /* widgets */
+        /* ************************** */
+        .widget-head {
+            font-size: x-large;
+            font-weight: bold;
+        }
+
+        .widget-content {
+            padding-top: 20px;
+            text-align: center;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .half_page_width, .full_page_width {
+            width: 800px;
+            height: 800px;
+        }
+
+        .echart_col {
+            text-align: -webkit-center;
+        } 
+
+        canvas {
+            margin: 0 auto;  /* center echart canvas in div */
         }
     </style>
 </head>
@@ -74,62 +102,68 @@
     </ons-modal>
 
     <!-- ************************************* -->
-    <!-- splitter -->
+    <!-- start navigator -->
     <!-- ************************************* -->
-    <ons-splitter>
-        <ons-splitter-side id="menu" side="left" width="50%" collapse>
-          <ons-page>
-            
-            <div class="content_container" id="map_interaction_container">
-                <ons-list>
-                    <!-- ***** -->
-                    <ons-list-item tappable>
-                        <label class="left">
-                            <ons-checkbox input-id="nav_show_district_borders" checked></ons-checkbox>
-                        </label>
-                        <label for="nav_show_district_borders" class="center">
-                            Show Borders of Suburbs
-                        </label>
-                    </ons-list-item>
-                    
-                    <!-- ***** -->
-                    <ons-list-item id="nav_district_button_list_container" tappable expandable>
-                        Show trees in selected districts
-                        <div class="expandable-content">
-                            <!-- dynamically created district list as 3x3 grid: build_district_selection_grid() -->
-                            <!-- hardcoded in fct: start with restricted tree display of Innenstadt and Ehrendfeld -->
-                            <ons-row id="nav_selected_districts_container"></ons-row>
-                        </div>
-                    </ons-list-item>
+    <ons-navigator id="myNavigator" page="home_splitter.html"></ons-navigator>
+    <!-- <ons-navigator id="myNavigator" page="map_page.html"></ons-navigator> -->
 
+    <!-- ************************************* -->
+    <!-- home_splitter: menu and venue_list -->
+    <!-- ************************************* -->
+    <template id="home_splitter.html">
+        <ons-page id="home_splitter">
+            <ons-splitter>
+                <ons-splitter-side id="side_menu" page="menu.html" side="left" width="80%" collapse></ons-splitter-side>
+                <ons-splitter-content id="content" page="map_page.html"></ons-splitter-content>
+            </ons-splitter>
+        </ons-page>
+    </template>
+
+    <!-- ************************************* -->
+    <!-- side menu -> map navigation -->
+    <!-- ************************************* -->
+    <template id="menu.html">
+        <ons-page id="menu">
+            <!-- ********************** -->
+            <!--  map navigation  -->
+            <!-- ********************** -->
+            <div class="content_container" id="map_interaction_container">
+                <p class="widget-head">Tree map display options</p>
+                <ons-list>
                     <!-- ***** -->
                     <ons-list-item tappable>
                         <ons-row>
                             <ons-col>
+                                <p>Select age groups of trees</p>
+                            </ons-col>
+                        </ons-row>
+
+                        <ons-row>
+                            <ons-col width="130px">
                                 <label class="left">
                                     <ons-checkbox data-agegroup="0" class="nav_age_group_checkbox" input-id="nav_filter_age_group_0" checked></ons-checkbox>
                                 </label>
                                 <label for="nav_filter_age_group_0" class="center">
-                                    < 26
+                                    <= 25 years
                                 </label>
                             </ons-col>
-                            <ons-col>
+                            <ons-col width="130px">
                                 <label class="left">
                                     <ons-checkbox data-agegroup="1" class="nav_age_group_checkbox" input-id="nav_filter_age_group_1" checked></ons-checkbox>
                                 </label>
                                 <label for="nav_filter_age_group_1" class="center">
-                                    26-40
+                                    26-40 years
                                 </label>
                             </ons-col>
-                            <ons-col>
+                            <ons-col width="130px">
                                 <label class="left">
                                     <ons-checkbox data-agegroup="2" class="nav_age_group_checkbox" input-id="nav_filter_age_group_2" checked></ons-checkbox>
                                 </label>
                                 <label for="nav_filter_age_group_2" class="center">
-                                    > 40
+                                    > 40 years
                                 </label>
                             </ons-col>
-                            <ons-col>
+                            <ons-col width="130px">
                                 <label class="left">
                                     <ons-checkbox data-agegroup="3" class="nav_age_group_checkbox" input-id="nav_filter_age_group_3" checked></ons-checkbox>
                                 </label>
@@ -141,14 +175,15 @@
                     </ons-list-item>
 
                     <!-- ***** -->
-                    <ons-list-item tappable>
-                        <p>Switch map style</p>
-                    </ons-list-item>
-                
-                    <!-- ***** -->
                     <ons-list-item>
                         <ons-row>
                             <ons-col>
+                                <p>Display options</p>
+                            </ons-col>
+                        </ons-row>
+
+                        <ons-row>
+                            <ons-col width="130px">
                                 <label class="left">
                                     <ons-radio name="nav_switch_map_style" value="streets" input-id="nav_switch_map_style_streets" checked></ons-radio>
                                     Streets
@@ -157,7 +192,7 @@
                                     Streets
                                 </label> -->
                             </ons-col>
-                            <ons-col>
+                            <ons-col width="130px">
                                 <label class="left">
                                     <ons-radio name="nav_switch_map_style" value="satellite" input-id="nav_switch_map_style_satellite"></ons-radio>
                                     Satellite
@@ -166,46 +201,162 @@
                                     Satellite
                                 </label> -->
                             </ons-col>
+
+                            <ons-col width="200px">
+                                <label class="left">
+                                    <ons-checkbox input-id="nav_show_district_borders" checked></ons-checkbox>
+                                </label>
+                                <label for="nav_show_district_borders" class="center">
+                                    Show suburb borders
+                                </label>
+                            </ons-col>
+                        </ons-row>
+                    </ons-list-item>
+
+                    <!-- ***** -->
+                    <!-- <ons-list-item id="nav_district_button_list_container" tappable expandable>
+                        Show trees in selected districts
+                        <div class="expandable-content"> -->
+                            <!-- dynamically created district list as 3x3 grid: build_district_selection_grid() -->
+                            <!-- hardcoded in fct: start with restricted tree display of Innenstadt and Ehrendfeld -->
+                            <!-- <ons-row id="nav_selected_districts_container"></ons-row> -->
+                        <!-- </div>
+                    </ons-list-item> -->
+
+                    <!-- ***** -->
+                    <ons-list-item>
+                        <ons-row>
+                            <ons-col>
+                                <p>Select districts with displayed trees</p>
+                            </ons-col>
+                        </ons-row>
+
+                        <ons-row id="nav_selected_districts_container">
                         </ons-row>
                     </ons-list-item>
                 </ons-list>
             </div>
+        </ons-page>
+    </template>
 
-          </ons-page>
-        </ons-splitter-side>
-        <ons-splitter-content id="map_page" page="map_page.html"></ons-splitter-content>
-    </ons-splitter>
-
-    <!-- ************************************* -->
-    <!-- start navigator -->
-    <!-- ************************************* -->
-    <!-- <ons-navigator id="myNavigator" page="map_section.html"></ons-navigator> -->
-
+    
     <!-- ************************************* -->
     <!-- map section -->
     <!-- ************************************* -->
     <template id="map_page.html">
         <ons-page id="map_page">
             <ons-toolbar>
-                <div class="left">
+                <!-- <div class="left">
                     <ons-toolbar-button onclick="fn.open()">
                         <ons-icon icon="md-menu"></ons-icon>
                     </ons-toolbar-button>
-                </div>
+                    Map Options
+                </div> -->
                 <div class="center">
                     Cologne Tree Map
                 </div>
             </ons-toolbar>
 
+            <!-- ********************** -->
+            <!-- the map -->
+            <!-- ********************** -->
+            <div id="tree_map">
+                <!-- open map options button -->
+                <ons-fab style="position: absolute; bottom: 40px; right: 40px;" onclick="fn.open()">
+                    <ons-icon icon="md-plus"></ons-icon>
+                </ons-fab>
+            </div>
+            
+
+            <!-- ********************** -->
+            <!-- content -->
+            <!-- ********************** -->
             <div class="content_container">
+                <!-- ********************** -->
+                <!-- some explanation -->
+                <!-- ********************** -->
                 <p>
                     Visualization of Cologne Tree Data. <b>As of now, this is work in progress.</b><br>
                     Check out <a href="https://github.com/zushicat/cologne-trees-REST-API" target="_blank">this github repository</a> for detailled information about the used data.
                 </p>
+
+                <!-- ******************************************** -->
+                <!-- overview charts -->
+                <!-- ******************************************** -->
+
+                <!-- ********************** -->
+                <!-- existing / cut -->
+                <!-- ********************** -->
+                <div class="widget-content">
+                    <p class="widget-head">Overall Numbers</p>
+                    <p>Dataset Overview</p>
+                    <ons-row>
+                        <ons-col class="echart_col">
+                            <p>How many trees do exist or are cut down since 2017?</p>
+                            <div id="overview_tree_count" class="echart half_page_width"></div>
+                            
+                            <!-- map percentage in text -->
+                            <p style="text-align: left;">
+                                <b><span id="overview_percentage_cut_down"></span>%</b> of trees in Cologne are presumably cut down between 2017 and 2020.<br>
+                                Those trees appear in the 2017 dataset but not in the 2020 dataset (of both cleaned up dataset versions).
+                            </p>
+                        </ons-col>
+                        <ons-col class="echart_col">
+                            <p>How complete is the original data?</p>
+                            <div id="overview_data_completeness" class="echart half_page_width"></div>
+                        </ons-col>
+                    </ons-row>
+                </div>
+
+                <!-- ********************** -->
+                <!-- pie charts age groups -->
+                <!-- ********************** -->
+                <div class="widget-content">
+                    <p class="widget-head">Age groups</p>
+                    <p>City trees are usually planted at an age between 8 - 12 years.</p>
+                    <ons-row>
+                        <ons-col class="echart_col">
+                            <p>Existing trees</p>
+                            <div id="overview_agegroups_tree_count" class="echart half_page_width"></div>
+                        </ons-col>
+                        <ons-col class="echart_col">
+                            <p>Cut down trees</p>
+                            <div id="overview_agegroups_cut_tree_count" class="echart half_page_width"></div>
+                        </ons-col>
+                    </ons-row>
+                </div>
+
+                <!-- ********************** -->
+                <!-- pie charts genus -->
+                <!-- ********************** -->
+                <div class="widget-content">
+                    <p class="widget-head">Genus</p>
+                    <!-- <p>City trees are usually planted at an age between 8 - 12 years.</p> -->
+                    <ons-row>
+                        <ons-col class="echart_col">
+                            <p>Existing trees by genus (>= 1.5% occurance in this cohort)</p>
+                            <div id="overview_genus_tree_count" class="echart half_page_width"></div>
+                        </ons-col>
+                        <ons-col class="echart_col">
+                            <p>Cut down trees by genus (>= 1.5% occurance in this cohort)</p>
+                            <div id="overview_genus_cut_tree_count" class="echart half_page_width"></div>
+                        </ons-col>
+                    </ons-row>
+                </div>
+
+                <!-- ********************** -->
+                <!-- district lists |-> individual district charts -->
+                <!-- ********************** -->
+                <!-- <div class="widget-content">
+                    <p class="widget-head">Districts of Cologne, Germany</p>
+                    <p>Something something bla bla blub.</p>
+                    <br>
+                    <ons-list>
+                        <ons-lazy-repeat id="infinite-district-list"></ons-lazy-repeat>
+                    </ons-list>
+                </div> -->
             </div>
 
-            
-            <div id="tree_map"></div>
         </ons-page>
     </template>
 
@@ -214,6 +365,20 @@
     <!-- script section -->
     <!-- ************************************* -->
     <script>
+        // prevent caching of once loaded json file
+        $(document).ready(function() 
+        {
+            $.ajaxSetup({ cache: false });
+        });
+
+        // ****
+        // globals
+        // ****
+        WINDOW_WIDTH = $(window).width(); // init width
+        
+        // ************
+        // map globals
+        // ************
         var MAP;
 
         var TREE_DATA_BY_ID = {};
@@ -239,6 +404,18 @@
             "9": "Mülheim"
         }
 
+        // ************
+        // charts globals
+        // ************
+        // var API_BASE_URL = "http://localhost/cologne-trees-static-API/endpoints/"  // local debug
+        var API_BASE_URL = "https://zushicat.github.io/cologne-trees-static-API/endpoints/"
+
+        var CHARTS_COLORSET_AGE_GROUPS = ["#c3eb34", "#7aeb34", "#2ed93c", "#4f96c9"]
+        var CHARTS_COLORSET_DEFAULT = ["#ccc", "#bbb", "#aaa", "#999", "#888", "#777", "#666", "#555", "#444", "#333", "#222", "#111", "#000"]
+        var CHARTS_COLORSET_BLACK = ["#222"]
+
+        var CHARTS_LIST = [];
+
         // *************************************************************
         // side menu
         // *************************************************************
@@ -246,14 +423,14 @@
 
         window.fn.open = function() 
         {
-            var menu = document.getElementById('menu');
+            var menu = document.getElementById('side_menu');
             menu.open();
         };
 
         window.fn.load = function(page) 
         {
             var content = document.getElementById('map_page');
-            var menu = document.getElementById('menu');
+            var menu = document.getElementById('side_menu');
             
             content.load(page).then(menu.close.bind(menu));
         };
@@ -266,20 +443,67 @@
             // document.querySelector('ons-modal').show();
             // console.log(event.target)
 
-            if(event.target.matches('#map_page')) 
+            if(event.target.matches("#map_page")) //('#map_page')) 
             {
+                //console.log("map page")
+                set_widgets_size();  // init echart widgets width
+            }
+
+            if(event.target.matches("#menu")) //('#map_page')) 
+            {
+                //console.log("menu page")
+            }
+
+            if(event.target.matches('#home_splitter'))   //("#home_splitter")) //('#map_page')) 
+            {
+                //console.log("splitter")
+                $.ajaxSetup({ cache: false });  // prevent caching of once loaded json file
+                
                 load_tree_data(function()
                 {
                     console.log("---- data loaded ----");
                     build_district_selection_grid(function()
                     {
                         add_navigation_elements_event_handler();
-                        display_map_data();
+                        //display_map_data();
                     });
                 });
+
+                create_main_page_overview_charts();
             }
         });
 
+        // *************************************************************
+        // set echarts widget size and resize event
+        // *************************************************************
+        function set_widgets_size()
+        {
+            $(".half_page_width").css("width", parseInt( (WINDOW_WIDTH/2) * 0.9 ));
+            $(".full_page_width").css("width", parseInt( WINDOW_WIDTH * 0.9 ));
+
+            $(".half_page_width").css("height", parseInt( ((WINDOW_WIDTH/2) * 0.9) * 0.7 ));
+            $(".full_page_width").css("height", ( (WINDOW_WIDTH * 0.9) * 0.7 ));
+
+
+            for(var i in CHARTS_LIST)
+            {
+                CHARTS_LIST[i].resize();
+            }
+        }
+
+        window.onresize = function(event) 
+        {
+            if(typeof($(window).width()) != "undefined")
+                WINDOW_WIDTH = $(window).width();
+            set_widgets_size();
+        };
+        
+        // **************************************************************
+        //
+        // Map
+        //
+        // **************************************************************
+        
         // *************************************************************
         // event listener: navigation elements
         // *************************************************************
@@ -288,7 +512,7 @@
             // **********
             // expandabale list for districts is default expanded
             // **********
-            document.querySelector("#nav_district_button_list_container").showExpansion()
+            //document.querySelector("#nav_district_button_list_container").showExpansion()
 
             // **********
             // toggle district border display
@@ -384,7 +608,7 @@
                 if(i%3 == 0)
                 {
                     j++;
-                    var tmp_list = $('<ons-col><ons-list></ons-list></ons-col>');
+                    var tmp_list = $('<ons-col><ons-list modifier="noborder"></ons-list></ons-col>');
                     $("ons-list", tmp_list).attr("id", "nav_district_trees_grid_" + j);
                     $("#nav_selected_districts_container").append(tmp_list);
                 }
@@ -394,7 +618,7 @@
                     tmp_checked = "checked";
 
                 var tmp_element = 
-                $('<ons-list-item tappable>\
+                $('<ons-list-item tappable  modifier="nodivider">\
                     <label class="left">\
                         <ons-checkbox data-district="' + SUBURB_LIST[i] + '" class="nav_district_trees_checkbox" input-id="nav_district_trees_element_' + i + '" ' + tmp_checked + '></ons-checkbox>\
                     </label>\
@@ -593,6 +817,27 @@
                 },
                 mapboxgl: mapboxgl
             }));
+
+            // ***
+            // toggle full screen
+            MAP.addControl(new mapboxgl.FullscreenControl());
+
+            // ***
+            // disable map zoom when using scroll
+            MAP.scrollZoom.disable();
+
+            // ***
+            // Add zoom and rotation controls to the map
+            // disable map rotation using navigation
+            MAP.addControl(new mapboxgl.NavigationControl({
+                showCompass: false,
+                showZoom: true
+            }));
+
+            // ***
+            // disable map rotation 
+            MAP.dragRotate.disable(); // using right click + drag
+            MAP.touchZoomRotate.disableRotation(); // using touch rotation gesture
         }
 
         // **************************************************************
@@ -859,5 +1104,233 @@
                 });
             });
         }
+    
+    
+
+        // **************************************************************
+        //
+        // Charts |-> map page
+        //
+        // **************************************************************
+        function get_json_data(endpoint, callback)
+        {
+            $.ajax(
+            {
+                url: API_BASE_URL + endpoint,
+                success: function(data)
+                {
+                    callback(data);
+                }
+            });
+        }
+
+        function create_main_page_overview_charts()
+        {
+            // ***
+            // data completeness
+            get_json_data("meta/data_completeness.json", function(json_data)
+            {
+                // console.log(json_data);
+                var data = [];
+                for(key in json_data)
+                {
+                    var value = json_data[key]["mean"];
+                    data.push({"value": value, "name": key.replace(/_/g, " ")});
+                }
+                draw_simple_bar_chart(data, "overview_data_completeness", CHARTS_COLORSET_BLACK)
+            });
+
+            // ***
+            // overall count
+            get_json_data("meta/overall_tree_count.json", function(json_data)
+            {
+                // console.log(json_data);
+                var data = [];
+                for(key in json_data)
+                {
+                    if(key == "percentage_cut_down_since_2017")
+                    {
+                        $("#overview_percentage_cut_down").text(parseInt(json_data[key] * 100))
+                        continue;
+                    }
+
+                    var value = json_data[key];
+                    data.push({"value": value, "name": key.replace(/_/g, " ")});
+                }
+                draw_simple_bar_chart(data, "overview_tree_count", CHARTS_COLORSET_BLACK)
+            });
+
+            // *********
+            // age groups
+            // *********
+            // age groups |-> count (existing) trees
+            get_json_data("agegroups/tree_count_with_predictions.json", function(json_data)
+            {
+                var data = [];
+                for(key in json_data)
+                {
+                    var value = json_data[key]["absolute"];
+                    substitute_key = {
+                        "unknown": "unknown", 
+                        "0": "<= 25", 
+                        "1": "26 - 40", 
+                        "2": "> 40"
+                    }
+                    
+                    key = substitute_key[key.toString()]
+                    
+                    data.push({"value": value, "name": key});
+                }
+                draw_pie_chart(data, "overview_agegroups_tree_count", CHARTS_COLORSET_AGE_GROUPS)
+            })
+
+            // ***
+            // age groups |-> count cut trees
+            get_json_data("agegroups/cut_tree_count_with_predictions.json", function(json_data)
+            {
+                var data = [];
+                for(key in json_data)
+                {
+                    var value = json_data[key]["absolute"];
+                    substitute_key = {
+                        "unknown": "unknown", 
+                        "0": "<= 25", 
+                        "1": "26 - 40", 
+                        "2": "> 40"
+                    }
+                    
+                    key = substitute_key[key.toString()]
+                    
+                    data.push({"value": value, "name": key});
+                }
+                draw_pie_chart(data, "overview_agegroups_cut_tree_count", CHARTS_COLORSET_AGE_GROUPS)
+            })
+        
+            // *********
+            // genus
+            // *********
+            // genus |-> count (existing) trees
+            get_json_data("meta/genus_name_german.json", function(json_data_names)
+            {
+                get_json_data("genus/tree_count_with_prediction.json", function(json_data)
+                {
+                    var data = [];
+                    for(key in json_data)
+                    {
+                        var name_german = json_data_names[key];
+                        
+                        var abs_value = json_data[key]["absolute"];
+                        var perc_value = json_data[key]["percentage"];
+
+                        if(perc_value < 0.02)
+                            continue;
+                        
+                        if(typeof(name_german) !== "undefined")
+                            key = name_german["name_german"];
+                        
+                        data.push({"value": abs_value, "name": key});
+                    }
+                    draw_pie_chart(data, "overview_genus_tree_count", CHARTS_COLORSET_DEFAULT, true)
+                });
+
+                get_json_data("genus/cut_tree_count_with_prediction.json", function(json_data)
+                {
+                    var data = [];
+                    for(key in json_data)
+                    {
+                        var name_german = json_data_names[key];
+                        
+                        var abs_value = json_data[key]["absolute"];
+                        var perc_value = json_data[key]["percentage"];
+
+                        if(perc_value < 0.015)
+                            continue;
+                        
+                        if(typeof(name_german) !== "undefined")
+                            key = name_german["name_german"];
+                        
+                        data.push({"value": abs_value, "name": key});
+                    }
+                    draw_pie_chart(data, "overview_genus_cut_tree_count", CHARTS_COLORSET_DEFAULT, true)
+                });
+            })
+        }
+
+        // *****
+        // draw widgets
+        // *****
+        function draw_pie_chart(data, chart_div_id, color_set, sorted_data) 
+        {
+            function get_series_data(current_data)
+            {
+                var processed_data = current_data; // unsorted
+                if(sorted_data == true)
+                {
+                    processed_data = processed_data.sort(function (a, b) { return a.value - b.value; });
+                }
+                return processed_data;
+            }
+
+
+            var current_echart = echarts.init(document.getElementById(chart_div_id));
+            
+            option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{b}<br/>absolute number: {c}"
+                },
+                grid: { containLabel: true },
+                color: color_set,
+                series: [
+                    {
+                        name:'Label sale',
+                        type:'pie',
+                        radius: ['40%', '70%'],
+                        label: {normal: {textStyle: { color: '#333' }}},
+                        labelLine: {normal: {lineStyle: { color: '#333'}}},
+                        data: get_series_data(data),  //data, //data.sort(function (a, b) { return a.value - b.value; }) else data,
+                    }
+                ]
+            };
+            
+            current_echart.setOption(option);
+            CHARTS_LIST.push(current_echart);
+        }
+
+        function draw_simple_bar_chart(data, chart_div_id, color_set)
+        {
+            var current_echart = echarts.init(document.getElementById(chart_div_id));
+
+            keys = [];
+            values = [];
+            for (var i in data) 
+            {
+                keys.push(data[i].name)
+                values.push(data[i].value)
+            }
+
+            option = {
+                xAxis: {
+                    type: 'category',
+                    data: keys,
+                    axisLabel: {
+                        rotate: 50
+                    },
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                grid: { containLabel: true },
+                color: color_set,
+                series: [{
+                    data: values,
+                    type: 'bar'
+                }]
+            }; 
+
+            current_echart.setOption(option);
+            CHARTS_LIST.push(current_echart)
+        }
+    
     </script>
 </body>
