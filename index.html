@@ -97,7 +97,8 @@
     <!-- ************************************* -->
     <ons-modal direction="up">
         <div style="text-align: center">
-        <ons-icon icon="md-spinner" size="60px" spin></ons-icon>
+            <ons-icon icon="md-spinner" size="60px" spin></ons-icon>
+            <p>Loading tree data for map...</p>
         </div>
     </ons-modal>
 
@@ -105,8 +106,7 @@
     <!-- start navigator -->
     <!-- ************************************* -->
     <ons-navigator id="myNavigator" page="home_splitter.html"></ons-navigator>
-    <!-- <ons-navigator id="myNavigator" page="map_page.html"></ons-navigator> -->
-
+    
     <!-- ************************************* -->
     <!-- home_splitter: menu and venue_list -->
     <!-- ************************************* -->
@@ -456,6 +456,9 @@
 
             if(event.target.matches('#home_splitter'))   //("#home_splitter")) //('#map_page')) 
             {
+                // show modal at start
+                document.querySelector('ons-modal').show();
+                
                 //console.log("splitter")
                 $.ajaxSetup({ cache: false });  // prevent caching of once loaded json file
                 
@@ -1093,6 +1096,8 @@
                     show_modal = e.isSourceLoaded;
                     if (e.isSourceLoaded) 
                     {
+                        // show modal at start
+                        document.querySelector('ons-modal').hide();
                         // console.log("----> HIDE MODAL");
                         // document.querySelector('ons-modal').hide();
                     }
