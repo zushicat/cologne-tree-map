@@ -454,7 +454,7 @@
             if(event.target.matches('#home_splitter'))   //("#home_splitter")) //('#map_page')) 
             {
                 // show modal at start
-                // document.querySelector('ons-modal').show();
+                document.querySelector('ons-modal').show();
                 
                 //console.log("splitter")
                 $.ajaxSetup({ cache: false });  // prevent caching of once loaded json file
@@ -465,7 +465,7 @@
                     build_district_selection_grid(function()
                     {
                         add_navigation_elements_event_handler();
-                        // display_map_data();
+                        display_map_data();
                     });
                 });
 
