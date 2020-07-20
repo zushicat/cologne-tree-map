@@ -8,5 +8,5 @@ __pycache__/
 .vscode/
 
 cologne_districts_polygons.json
-trees_cologne_merged_reduced.jsonl
+trees_cologne_reduced.jsonln
 OLD_cologne_districts_polygons.json
