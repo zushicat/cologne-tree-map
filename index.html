@@ -95,7 +95,7 @@
     <!-- ************************************* -->
     <!-- modal on init -->
     <!-- ************************************* -->
-    <ons-modal direction="up">
+    <ons-modal direction="up" style="background-color: #aaa;">
         <div style="text-align: center">
             <ons-icon icon="md-spinner" size="60px" spin></ons-icon>
             <p>Loading tree data for map...</p>
@@ -655,7 +655,7 @@
                         {
                             zip.file(filename).async('string').then(function(content) 
                             {
-                                if(filename == "trees_cologne_merged_reduced.jsonl")
+                                if(filename == "trees_cologne_reduced.jsonln")
                                 {
                                     tree_data_lines = content.split("\n");
                                     for(var i in tree_data_lines)
@@ -1093,10 +1093,7 @@
                     show_modal = e.isSourceLoaded;
                     if (e.isSourceLoaded) 
                     {
-                        // show modal at start
-                        document.querySelector('ons-modal').hide();
-                        // console.log("----> HIDE MODAL");
-                        // document.querySelector('ons-modal').hide();
+                        document.querySelector('ons-modal').hide({animation: "fade"});
                     }
                     else
                     {
@@ -1214,6 +1211,7 @@
             // genus |-> count (existing) trees
             get_json_data("meta/genus_name_german.json", function(json_data_names)
             {
+                // console.log(json_data_names)
                 get_json_data("genus/tree_count_with_prediction.json", function(json_data)
                 {
                     var data = [];
@@ -1228,7 +1226,7 @@
                             continue;
                         
                         if(typeof(name_german) !== "undefined")
-                            key = name_german["name_german"];
+                            key = name_german;
                         
                         data.push({"value": abs_value, "name": key});
                     }
@@ -1249,7 +1247,7 @@
                             continue;
                         
                         if(typeof(name_german) !== "undefined")
-                            key = name_german["name_german"];
+                            key = name_german;
                         
                         data.push({"value": abs_value, "name": key});
                     }
