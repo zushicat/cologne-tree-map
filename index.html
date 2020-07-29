@@ -276,13 +276,33 @@
                 <!-- some explanation -->
                 <!-- ********************** -->
                 <p>
-                    Visualization of Cologne Tree Data. <b>As of now, this is work in progress.</b><br>
-                    Check out <a href="https://zushicat.github.io/cologne-trees-static-API" target="_blank">https://zushicat.github.io/cologne-trees-static-API</a> for detailled information about the used data.
+                    Visualization of Cologne Tree Data. <b>As of now, this is work in progress.</b>
+                    <br><br>
+                    This visualization uses heavily modified and enriched data stemming from the official "Baumkataster" datasets for 2017 and 2020, published by
+                    Stadt Köln under Creative Commons Namensnennung 3.0 DE in <a href="https://offenedaten-koeln.de/dataset/baumkataster-koeln" target="_blank">https://offenedaten-koeln.de/dataset/baumkataster-koeln</a>
+                    <br>
+                    Please refer to <a href="https://zushicat.github.io/cologne-trees-static-API" target="_blank">https://zushicat.github.io/cologne-trees-static-API</a> 
+                    and <a href="https://github.com/zushicat/cologne-trees-data" target="_blank">https://github.com/zushicat/cologne-trees-data</a><a href="https://zushicat.github.io/cologne-trees-static-API" target="_blank">https://zushicat.github.io/cologne-trees-static-API</a>
+                    for detailled information about the data enrichment process and the accumulation of the underlaying data.
                 </p>
 
                 <!-- ******************************************** -->
                 <!-- overview charts -->
                 <!-- ******************************************** -->
+
+                <!-- ********************** -->
+                <!-- age by genus / base_info vs. regression -->
+                <!-- ********************** -->
+                <!-- <div class="widget-content">
+                    <p class="widget-head">age data comparison</p>
+                    <p>age by genus / base_info vs. regression</p>
+                    <ons-row>
+                        <ons-col class="echart_col">
+                            <p>Bla</p>
+                            <div id="overview_age_gt_regression" class="echart full_page_width"></div>
+                        </ons-col>
+                    </ons-row>
+                </div> -->
 
                 <!-- ********************** -->
                 <!-- existing / cut -->
@@ -292,17 +312,17 @@
                     <p>Dataset Overview</p>
                     <ons-row>
                         <ons-col class="echart_col">
-                            <p>How many trees do exist or are cut down since 2017?</p>
+                            <p>Tree Existence In Datasets</p>
                             <div id="overview_tree_count" class="echart half_page_width"></div>
                             
                             <!-- map percentage in text -->
                             <p style="text-align: left;">
-                                <b><span id="overview_percentage_cut_down"></span>%</b> of trees in Cologne are presumably cut down between 2017 and 2020.<br>
-                                Those trees appear in the 2017 dataset but not in the 2020 dataset (of both cleaned up dataset versions).
+                                <b><span id="overview_number_cut_down"></span> (<span id="overview_percentage_cut_down"></span>%)</b> of trees in Cologne are presumably cut down between 2017 and 2020.<br>
+                                (Those trees appear in the 2017 dataset but not in the 2020 dataset.)
                             </p>
                         </ons-col>
                         <ons-col class="echart_col">
-                            <p>How complete is the original data?</p>
+                            <p>Data Completeness</p>
                             <div id="overview_data_completeness" class="echart half_page_width"></div>
                         </ons-col>
                     </ons-row>
@@ -313,7 +333,6 @@
                 <!-- ********************** -->
                 <div class="widget-content">
                     <p class="widget-head">Age groups</p>
-                    <p>City trees are usually planted at an age between 8 - 12 years.</p>
                     <ons-row>
                         <ons-col class="echart_col">
                             <p>Existing trees</p>
@@ -324,6 +343,12 @@
                             <div id="overview_agegroups_cut_tree_count" class="echart half_page_width"></div>
                         </ons-col>
                     </ons-row>
+                    <p style="text-align: left;">
+                        The age information per tree is derived from a regression model (relationship genus, trunk diameter -> age, 
+                        applied to each individual tree) due to the unreliable and incomplete (individual) age data in the original datasets.
+                        <br><br>
+                        Please note: The age (and consequently the age group) refers to the year of sowing (instead of planting). City trees are usually planted at an age between 8 - 12 years.
+                    </p>
                 </div>
 
                 <!-- ********************** -->
@@ -340,6 +365,24 @@
                         <ons-col class="echart_col">
                             <p>Cut down trees by genus (>= 1.5% occurance in this cohort)</p>
                             <div id="overview_genus_cut_tree_count" class="echart half_page_width"></div>
+                        </ons-col>
+                    </ons-row>
+                </div>
+
+                <!-- ********************** -->
+                <!-- districts |-> tree count
+                <!-- ********************** -->
+                <div class="widget-content">
+                    <p class="widget-head">Trees Per Districts</p>
+                    <p>How many trees are in which district?</p>
+                    <ons-row>
+                        <ons-col class="echart_col">
+                            <p>Absolute numbers</p>
+                            <div id="overview_districts_tree_count_num" class="echart half_page_width"></div>
+                        </ons-col>
+                        <ons-col class="echart_col">
+                            <p>Percentages of all trees</p>
+                            <div id="overview_districts_tree_count_perc" class="echart half_page_width"></div>
                         </ons-col>
                     </ons-row>
                 </div>
@@ -1152,6 +1195,10 @@
                         $("#overview_percentage_cut_down").text(parseInt(json_data[key] * 100))
                         continue;
                     }
+                    if(key == "cut_down_trees")
+                    {
+                        $("#overview_number_cut_down").text(parseInt(json_data[key]))
+                    }
 
                     var value = json_data[key];
                     data.push({"value": value, "name": key.replace(/_/g, " ")});
@@ -1254,6 +1301,81 @@
                     draw_pie_chart(data, "overview_genus_cut_tree_count", CHARTS_COLORSET_DEFAULT, true)
                 });
             })
+        
+            
+            // *********
+            // districts numbers
+            // *********
+            // districts |-> percentage & abs.
+            get_json_data("districts/tree_count.json", function(json_data_exist)
+            {
+                var tmp_district_values = {};
+                data_piechart = []
+                get_json_data("districts/cut_tree_count.json", function(json_data_cut_down)
+                {
+                    var tmp_values = [];
+                    var axis_keys = []
+                    var existing_values = []
+                    var cutdown_values = []
+                    for(key in json_data_cut_down)  // same keys in both datasets
+                    {
+                        if(key == "unknown")
+                            continue;
+
+                        axis_keys.push(key)
+                        existing_values.push(json_data_exist[key]["absolute"]);
+                        cutdown_values.push(json_data_cut_down[key]["absolute"]);
+
+                        // for pechart percentages
+                        data_piechart.push({"value": json_data_exist[key]["absolute"], "name": key});
+                    }
+
+                    var data = [];
+                    data.push({"type": 'bar', "stack": 'districts', "data": existing_values});
+                    data.push({"type": 'bar', "stack": 'districts', "data": cutdown_values});
+
+                    draw_stacked_bar_chart(data, axis_keys, "overview_districts_tree_count_num", ["#2fd93d", "#d95f2f"])
+                    draw_pie_chart(data_piechart, "overview_districts_tree_count_perc", CHARTS_COLORSET_DEFAULT, true)
+                })
+            })
+
+            // genus |-> year_sprout / bole_radius comparison: gt / regression
+            // get_json_data("genus/regression_bole_radius_year_sprout.json", function(json_data_regression)
+            // {
+            //     get_json_data("genus/ground_truth_bole_radius_year_planting.json", function(json_data_gt)
+            //     {
+            //         // get data from regression -> [[25, 1996]]
+            //         var genus = "Platanus"
+            //         var line_data = []
+            //         for(bole_radius in json_data_regression[genus])
+            //         {
+            //             if(parseInt(bole_radius) > 200)
+            //                 continue
+
+            //             for(year in json_data_regression[genus][bole_radius])
+            //             {
+            //                 line_data.push([parseInt(bole_radius), parseInt(year)])
+            //             }
+            //         }
+
+            //         // get data from gt -> [[25, 1990, 10]]
+            //         var bubble_chart_data = []
+            //         for(bole_radius in json_data_gt[genus])
+            //         {
+            //             for(year in json_data_gt[genus][bole_radius])
+            //             {
+            //                 year = parseInt(year) - 10;
+            //                 if(year < 1800)
+            //                     continue;
+
+            //                 var tree_num = json_data_gt[genus][bole_radius][year]
+            //                 bubble_chart_data.push([parseInt(bole_radius), year, parseInt(tree_num)])
+            //             }
+            //         }
+
+            //         bubble_scatter_line(line_data, bubble_chart_data, "overview_age_gt_regression")
+            //     });
+            // });
         }
 
         // *****
@@ -1331,6 +1453,71 @@
             current_echart.setOption(option);
             CHARTS_LIST.push(current_echart)
         }
+
+        function draw_stacked_bar_chart(data, axis_keys, chart_div_id, color_set)
+        {
+            var current_echart = echarts.init(document.getElementById(chart_div_id));
+
+            option = {
+                tooltip: {
+                    trigger: 'item',
+                    //formatter: "{b}<br/>absolute number: {c}"
+                },
+                xAxis: {
+                    type: 'category',
+                    data: axis_keys,
+                    axisLabel: {
+                        rotate: 50
+                    },
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                grid: { containLabel: true },
+                color: color_set,
+                series: data
+            }; 
+
+            current_echart.setOption(option);
+            CHARTS_LIST.push(current_echart)
+        }
     
+        function bubble_scatter_line(line_data, bubble_chart_data, chart_div_id)
+        {
+            // var current_echart = echarts.init(document.getElementById(chart_div_id));
+
+            // option = {
+            //     xAxis: {
+            //         max: 100,
+            //     },
+            //     yAxis: {
+            //         scale: true,
+            //         axisLabel: {
+            //             formatter: (function(value) {
+            //                 return parseInt(value)
+            //             })
+            //         }
+            //     },
+            //     series: [
+            //     {
+            //         name: 'gt',
+            //         data: bubble_chart_data,
+            //         type: 'scatter',
+            //         symbolSize: function (data) 
+            //         {
+            //             return data[2];
+            //         }
+            //     },
+            //     {
+            //         name: 'regression',
+            //         data: line_data,
+            //         type: 'line',
+            //     }
+            //     ]
+            // };
+
+            // current_echart.setOption(option);
+            // CHARTS_LIST.push(current_echart)
+        }
     </script>
 </body>
