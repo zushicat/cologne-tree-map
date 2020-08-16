@@ -106,6 +106,7 @@
     <!-- start navigator -->
     <!-- ************************************* -->
     <ons-navigator id="myNavigator" page="home_splitter.html"></ons-navigator>
+    <!-- <ons-navigator id="myNavigator" page="district_page.html"></ons-navigator> -->
     
     <!-- ************************************* -->
     <!-- home_splitter: menu and venue_list -->
@@ -241,7 +242,7 @@
 
     
     <!-- ************************************* -->
-    <!-- map section -->
+    <!-- main / start / map page -->
     <!-- ************************************* -->
     <template id="map_page.html">
         <ons-page id="map_page">
@@ -258,10 +259,9 @@
             </ons-toolbar>
 
             <!-- ********************** -->
-            <!-- the map -->
+            <!-- the map with map options button -->
             <!-- ********************** -->
             <div id="tree_map">
-                <!-- open map options button -->
                 <ons-fab style="position: absolute; bottom: 40px; right: 40px;" onclick="fn.open()">
                     <ons-icon icon="md-plus"></ons-icon>
                 </ons-fab>
@@ -318,7 +318,7 @@
                 </div> -->
 
                 <!-- ********************** -->
-                <!-- existing / cut -->
+                <!-- overall existing / data completeness -->
                 <!-- ********************** -->
                 <div class="widget-content">
                     <p class="widget-head">Overall Numbers</p>
@@ -342,7 +342,7 @@
                 </div>
 
                 <!-- ********************** -->
-                <!-- existing / cut -->
+                <!-- object type -->
                 <!-- ********************** -->
                 <div class="widget-content">
                     <p class="widget-head">Distribution by Object Types</p>
@@ -383,10 +383,11 @@
                                 <p>
                                     In contrast, the object types 
                                     <ul>
-                                        <li>green space</li>
+                                        <li>street/court (plaza)</li>
                                         <li>unknown</li>
                                     </ul>
-                                    have a significant share within the data of (presumably) cut down trees.
+                                    have a significant share within the data of (presumably) cut down trees with felled
+                                    trees in street surroundings with approx. half of the share clearly in top position.
                                 </p>
                             </div>
                         </ons-col>
@@ -422,7 +423,7 @@
                 <!-- pie charts genus -->
                 <!-- ********************** -->
                 <div class="widget-content">
-                    <p class="widget-head">Genus</p>
+                    <p class="widget-head">Overview Genus</p>
                     <!-- <p>City trees are usually planted at an age between 8 - 12 years.</p> -->
                     <ons-row>
                         <ons-col class="echart_col">
@@ -450,7 +451,7 @@
                 <!-- districts |-> tree count
                 <!-- ********************** -->
                 <div class="widget-content">
-                    <p class="widget-head">Trees Per Districts</p>
+                    <p class="widget-head">Overview Districts</p>
                     <p>How many trees are in which district?</p>
                     <ons-row>
                         <ons-col class="echart_col">
@@ -466,38 +467,103 @@
                         <ons-col class="echart_col">
                             <p>Distribution in % of overall cut down trees</p>
                             <div id="overview_districts_tree_count_perc_overall" class="echart half_page_width"></div>
-                            <p style="text-align: left;">
-                                The data shows that significantly more trees were felled in Rhodenkirchen and
-                                significantly less trees were felled in Porz compared to other districts.
-                            </p>
+                            <div style="text-align: left;">
+                                <p>
+                                    The data shows that 
+                                    <ul>
+                                        <li>
+                                            significantly more trees were felled in Rhodenkirchen and Lindenthal
+                                        </li>
+                                        <li>
+                                            significantly less trees were felled in Porz
+                                        </li>
+                                    </ul>
+                                    compared to other districts.
+                                </p>
+                            </div>
                         </ons-col>
                         <ons-col class="echart_col">
                             <p>Cut down trees % of each individual district tree distribution</p>
                             <div id="overview_districts_cut_tree_count_perc_district" class="echart half_page_width"></div>
                             <p style="text-align: left;">
                                 If the proportion of trees that no longer exist is examined separately for each district, 
-                                Rhodenkirchen also takes the top position with 12% loss of the previous tree population.
+                                Rhodenkirchen also takes the top position in loss compared to the previous tree population.
                             </p>
                         </ons-col>
                     </ons-row>
-                </div>
+                </div> 
 
                 <!-- ********************** -->
                 <!-- district lists |-> individual district charts -->
                 <!-- ********************** -->
-                <!-- <div class="widget-content">
-                    <p class="widget-head">Districts of Cologne, Germany</p>
-                    <p>Something something bla bla blub.</p>
+                <div class="widget-content">
+                    <p class="widget-head">Districts details</p>
+                    <p>Get detailled insights about individual districts and their suburbs.</p>
                     <br>
                     <ons-list>
-                        <ons-lazy-repeat id="infinite-district-list"></ons-lazy-repeat>
+                        <ons-list-item modifier="chevron" onclick="start_district_details_page('Innenstadt')" tappable>Innenstadt</ons-list-item>
+                        <ons-list-item modifier="chevron" onclick="start_district_details_page('Rodenkirchen')" tappable>Rodenkirchen</ons-list-item>
+                        <ons-list-item modifier="chevron" onclick="start_district_details_page('Lindenthal')" tappable>Lindenthal</ons-list-item>
+                        <ons-list-item modifier="chevron" onclick="start_district_details_page('Ehrenfeld')" tappable>Ehrenfeld</ons-list-item>
+                        <ons-list-item modifier="chevron" onclick="start_district_details_page('Nippes')" tappable>Nippes</ons-list-item>
+                        <ons-list-item modifier="chevron" onclick="start_district_details_page('Chorweiler')" tappable>Chorweiler</ons-list-item>
+                        <ons-list-item modifier="chevron" onclick="start_district_details_page('Porz')" tappable>Porz</ons-list-item>
+                        <ons-list-item modifier="chevron" onclick="start_district_details_page('Kalk')" tappable>Kalk</ons-list-item>
+                        <ons-list-item modifier="chevron" onclick="start_district_details_page('Mülheim')" tappable>Mülheim</ons-list-item>
                     </ons-list>
-                </div> -->
+                </div>
             </div>
 
         </ons-page>
     </template>
 
+
+    <!-- ************************************* -->
+    <!-- district / suburb page -->
+    <!-- ************************************* -->
+    <template id="district_page.html">
+        <ons-page id="district_page">
+            <ons-toolbar id="agent_view_manager_toolbar">
+                <div class="left"><ons-back-button>Back to overview</ons-back-button></div>
+                <div class="center">Details <span class="suburb_name_text_var"></span></div>
+              </ons-toolbar>
+
+            <div class="content_container">
+                <div class="widget-content">
+                    <p class="widget-head">Suburb tree distribution</p>
+                    <p>How many trees are in which suburb?</p>
+                    <ons-row>
+                        <ons-col class="echart_col">
+                            <p>Absolute numbers of existing (green) and cut down trees (red)</p>
+                            <div id="overview_suburbs_tree_count_num" class="echart half_page_width"></div>
+                        </ons-col>
+                        <ons-col class="echart_col">
+                            <p>% share of overall trees in <span class="suburb_name_text_var"></span></p>
+                            <div id="overview_suburbs_tree_count_perc" class="echart half_page_width"></div>
+                        </ons-col>
+                    </ons-row>
+                    <ons-row>
+                        <ons-col class="echart_col">
+                            <p>% share of overall cut down trees in <span class="suburb_name_text_var"></span></p>
+                            <div id="overview_suburbs_tree_count_perc_overall" class="echart half_page_width"></div>
+                            <div style="text-align: left;">
+                                <p>
+                                    
+                                </p>
+                            </div>
+                        </ons-col>
+                        <ons-col class="echart_col">
+                            <p>Cut down trees % of each individual suburb tree distribution</p>
+                            <div id="overview_suburbs_cut_tree_count_perc_district" class="echart half_page_width"></div>
+                            <p style="text-align: left;">
+                                
+                            </p>
+                        </ons-col>
+                    </ons-row>
+                </div>
+            </div>
+        </ons-page>
+    </template>
 
     <!-- ************************************* -->
     <!-- script section -->
@@ -608,6 +674,19 @@
                 });
 
                 create_main_page_overview_charts();
+
+                load_district_page_globals();
+            }
+
+            if(event.target.matches('#district_page')) 
+            {
+                $.ajaxSetup({ cache: false });
+                set_widgets_size();  // init echart widgets width
+
+                var current_district = event.target.data.district_name
+                // var current_district = "Innenstadt";
+                create_district_details_charts(current_district);
+                
             }
         });
 
@@ -807,7 +886,8 @@
                                             var lng = tree_data.lng;
 
                                             var genus = tree_data.genus;
-                                            var in_dataset_2020 = tree_data.in_dataset_2020
+                                            var in_dataset_2020 = tree_data.in_dataset_2020;
+                                            var object_type = tree_data.object_type;
                                             
                                             var district_number = tree_data.district_number;
                                             if(district_number == null)
@@ -840,7 +920,8 @@
                                                     "id": tree_id,
                                                     "age_group": age_group,
                                                     "genus": genus,
-                                                    "in_dataset_2020": in_dataset_2020
+                                                    "in_dataset_2020": in_dataset_2020,
+                                                    "object_type": object_type,
                                                 }
                                             }
 
@@ -1239,9 +1320,61 @@
                         // document.querySelector('ons-modal').show();
                     }
                 });
+
+                
+                var map_layer = MAP.getStyle().layers;
+                
+                var map_layer_ids = [];
+                for (var i = 0; i < map_layer.length; i++) 
+                {
+                    if(map_layer[i].id.search("trees_layer") == -1)
+                        continue;
+                    map_layer_ids.push(map_layer[i].id);
+                }
+
+                
+                MAP.on('click', function(e) 
+                {
+                    var features = MAP.queryRenderedFeatures(e.point, {
+                        layers: map_layer_ids // replace this with the name of the layer
+                    });
+
+                    if (!features.length) {
+                        return;
+                    }
+
+                    var feature = features[0];
+                    
+                    var coordinates = feature.geometry.coordinates.slice();
+                    var tree_id = feature.properties.id;
+                    var age_group = feature.properties.age_group;
+                    var genus = feature.properties.genus;
+                    var object_type = feature.properties.object_type;
+                    var in_dataset_2020 = feature.properties.in_dataset_2020;
+
+                    var description_html = "<p>\
+                        Tree_ID:<br>" + tree_id + "<br>\
+                        Age group: " + age_group + "<br>\
+                        Genus: " + genus + "<br>\
+                        Object type: " + object_type + "<br>\
+                        Still existing: " + in_dataset_2020 + "</p>\
+                    "
+
+                    // Ensure that if the map is zoomed out such that multiple
+                    // copies of the feature are visible, the popup appears
+                    // over the copy being pointed to.
+                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                    }
+
+                    new mapboxgl.Popup()
+                        .setLngLat(coordinates)
+                        .setHTML(description_html)
+                        .addTo(MAP);
+                });            
             });
         }
-    
+
     
 
         // **************************************************************
@@ -1673,5 +1806,159 @@
             // current_echart.setOption(option);
             // CHARTS_LIST.push(current_echart)
         }
+    
+    
+        
+        // **************************************************************************************
+        //
+        // district page / view
+        //
+        // **************************************************************************************
+        var META_DISTRICTS_SUBURB = {};
+        var META_DATA_COMPLETENESS = {"districts": {}, "suburbs": {}};
+
+        var TREE_COUNT = {"districts": {}, "suburbs": {}};
+        var CUT_TREE_COUNT = {"districts": {}, "suburbs": {}};
+
+        var GENUS = {"districts": {}, "suburbs": {}};  // with predictions
+        var AGE_GROUPS = {"districts": {}, "suburbs": {}};  // with predictions
+        var OBJECT_TYPE = {"districts": {}, "suburbs": {}};
+        
+        function load_district_page_globals()
+        {
+            get_json_data("meta/districts_suburbs.json", function(json_data) { META_DISTRICTS_SUBURB = json_data; });
+
+            get_json_data("meta/district_data_completeness.json", function(json_data) { META_DATA_COMPLETENESS["districts"] = json_data; });
+            get_json_data("meta/suburb_data_completeness.json", function(json_data) { META_DATA_COMPLETENESS["suburbs"] = json_data; });
+            get_json_data("districts/tree_count.json", function(json_data) { TREE_COUNT["districts"] = json_data; });
+            get_json_data("suburbs/tree_count.json", function(json_data) { TREE_COUNT["suburbs"] = json_data; });
+            get_json_data("districts/cut_tree_count.json", function(json_data) { CUT_TREE_COUNT["districts"] = json_data; });
+            get_json_data("suburbs/cut_tree_count.json", function(json_data) { CUT_TREE_COUNT["suburbs"] = json_data; });
+            get_json_data("districts/genus_with_predictions.json", function(json_data) { GENUS["districts"] = json_data; });
+            get_json_data("suburbs/genus_with_predictions.json", function(json_data) { GENUS["suburbs"] = json_data; });
+            get_json_data("districts/age_groups_with_predictions.json", function(json_data) { AGE_GROUPS["districts"] = json_data; });
+            get_json_data("suburbs/age_groups_with_predictions.json", function(json_data) { AGE_GROUPS["suburbs"] = json_data; });
+            get_json_data("districts/object_type.json", function(json_data) { OBJECT_TYPE["districts"] = json_data; });
+            get_json_data("suburbs/object_type.json", function(json_data) { OBJECT_TYPE["suburbs"] = json_data; });
+        }
+        
+        function start_district_details_page(district_name)
+        {
+            ons.notification.toast('Change to details page of ' + district_name, 
+            {
+                timeout: 500
+            });
+            
+            document.querySelector('#myNavigator').pushPage('district_page.html', {
+                data: {"district_name": district_name}
+            });
+        }
+
+        function create_district_details_charts(district_name)
+        {
+            // set page text variables to district name
+            $(".suburb_name_text_var").each(function() {
+                $(this).text(district_name);
+            });
+            
+            // get suburb name list within district
+            var current_suburbs = META_DISTRICTS_SUBURB[district_name];
+            
+            // get current suburb values
+            var current_tree_count_suburbs = {};
+            var current_cut_tree_count_suburbs = {};
+            var current_genus_suburbs = {};
+            var current_age_groups_suburbs = {};
+            var current_object_type_suburbs = {};
+
+            for(var i in current_suburbs)
+            {
+                s = current_suburbs[i];
+
+                current_tree_count_suburbs[s] = TREE_COUNT.suburbs[s];
+                current_cut_tree_count_suburbs[s] = CUT_TREE_COUNT.suburbs[s];
+                current_genus_suburbs[s] = GENUS.suburbs[s];
+                current_age_groups_suburbs[s] = AGE_GROUPS.suburbs[s];
+                current_object_type_suburbs[s] = OBJECT_TYPE.suburbs[s];
+            }
+            
+            create_tree_count_data(current_tree_count_suburbs, current_cut_tree_count_suburbs)
+        }
+
+
+        // **************
+        //
+        // **************
+        function create_tree_count_data(json_data_exist, json_data_cut_down)
+        {
+            var tmp_district_values = {};
+            var data_piechart = []
+            var data_cut_down_perc = [];
+            
+            var tmp_values = [];
+            var axis_keys = []
+            var existing_values = []
+            var cutdown_values = []
+            var cutdown_values_district = []
+            var cutdown_values_overall = []
+            
+            for(key in json_data_exist)  // same keys in both datasets
+            {
+                if(key == "unknown")
+                    continue;
+
+                try {
+                    existing_value_abs = json_data_exist[key]["absolute"];
+                } catch {
+                    existing_value_abs = 0;
+                }
+
+                try {
+                    cut_down_value_abs = json_data_cut_down[key]["absolute"];
+                } catch {
+                    cut_down_value_abs = 0;
+                }
+
+                axis_keys.push(key)
+                existing_values.push(existing_value_abs);
+                cutdown_values.push(cut_down_value_abs);
+
+                try {
+                    cutdown_values_district.push({
+                        "value": ((cut_down_value_abs/(existing_value_abs + cut_down_value_abs)) * 100).toFixed(2), 
+                        "name": key
+                    });
+                } catch {
+                    cutdown_values_district.push({"value": 0, "name": key});
+                }
+                
+                try {
+                    cutdown_values_overall.push({"value": (json_data_cut_down[key]["percentage"]*100).toFixed(2), "name": key});
+                } catch {
+                    cutdown_values_overall.push({"value": 0, "name": key});
+                }
+
+                try {
+                    data_piechart.push({"value": (json_data_exist[key]["percentage"]*100).toFixed(2), "name": key});
+                } catch {
+                    data_piechart.push({"value": 0, "name": key});
+                }
+
+            }
+
+            var data = [];
+            data.push({"type": 'bar', "stack": 'suburbs', "data": existing_values});
+            data.push({"type": 'bar', "stack": 'suburbs', "data": cutdown_values});
+
+
+            draw_stacked_bar_chart(data, axis_keys, "overview_suburbs_tree_count_num", ["#2fd93d", "#d95f2f"]);
+            draw_pie_chart(data_piechart, "overview_suburbs_tree_count_perc", CHARTS_COLORSET_DEFAULT, true);
+        
+            draw_pie_chart(cutdown_values_overall, "overview_suburbs_tree_count_perc_overall", CHARTS_COLORSET_DEFAULT, true);
+            draw_simple_bar_chart(cutdown_values_district, "overview_suburbs_cut_tree_count_perc_district", CHARTS_COLORSET_BLACK);
+        }
+
+
+    
     </script>
 </body>
