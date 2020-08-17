@@ -376,6 +376,9 @@
                     So far, this method of tree detection showed great initial results and will be a tremendous step forward to depict the real situation of 
                     tree distribution throughout the city.<br>
                     The according results resp. the repository link will be published here as soon as possible.
+                    <br><br>
+                    <b>Please keep in mind</b> that this visualization as of now only reflects the trees distribution
+                     as derived from the official catalogues.
                 </p>
 
                 <!-- ******************************************** -->
@@ -480,7 +483,7 @@
                 </div>
 
                 <!-- ********************** -->
-                <!-- pie charts age groups -->
+                <!-- age groups -->
                 <!-- ********************** -->
                 <div class="widget-content">
                     <p class="widget-head">Age groups</p>
@@ -505,7 +508,7 @@
                 </div>
 
                 <!-- ********************** -->
-                <!-- pie charts genus -->
+                <!-- genus -->
                 <!-- ********************** -->
                 <div class="widget-content">
                     <p class="widget-head">Overview Genus</p>
@@ -574,6 +577,27 @@
                                 If the proportion of trees that no longer exist is examined separately for each district, 
                                 Rhodenkirchen also takes the top position in loss compared to the previous tree population.
                             </p>
+                        </ons-col>
+                    </ons-row>
+                </div> 
+
+                <!-- ********************** -->
+                <!-- districts |-> trees per square km
+                <!-- ********************** -->
+                <div class="widget-content">
+                    <p class="widget-head">Tree density</p>
+                    <p>
+                        The areas of the districts vary quite considerably, hence the density (trees per square km)
+                        can be of interest in certain situations.
+                    </p>
+                    <ons-row>
+                        <ons-col class="echart_col">
+                            <p>Existing trees per square km</p>
+                            <div id="overview_districts_trees_area_num" class="echart half_page_width"></div>
+                        </ons-col>
+                        <ons-col class="echart_col">
+                            <p>Cut down trees per square km</p>
+                            <div id="overview_districts_cut_trees_area_num" class="echart half_page_width"></div>
                         </ons-col>
                     </ons-row>
                 </div> 
@@ -691,6 +715,31 @@
             "7": "Porz",
             "8": "Kalk",
             "9": "Mülheim"
+        }
+
+        // area in square km
+        var DISTRICT_AREA_BY_ID = {
+            "1": 16.37,
+            "2": 54.55,
+            "3": 41.80,
+            "4": 23.98,
+            "5": 31.75,
+            "6": 67.16,
+            "7": 78.92,
+            "8": 38.16,
+            "9": 52.20
+        }
+
+        var DISTRICT_AREA_BY_NAME = {
+            "Innenstadt": 16.37,
+            "Rodenkirchen": 54.55,
+            "Lindenthal": 41.80,
+            "Ehrenfeld": 23.98,
+            "Nippes": 31.75,
+            "Chorweiler": 67.16,
+            "Porz": 78.92,
+            "Kalk": 38.16,
+            "Mülheim": 52.20
         }
 
         // ************
@@ -1699,20 +1748,36 @@
             get_json_data("districts/tree_count.json", function(json_data_exist)
             {
                 var tmp_district_values = {};
-                data_piechart = []
-                data_cut_down_perc = [];
+                var data_piechart = []
+                var data_cut_down_perc = [];
+                var data_density = [];
+
                 get_json_data("districts/cut_tree_count.json", function(json_data_cut_down)
                 {
                     var tmp_values = [];
                     var axis_keys = []
                     var existing_values = []
+
+                    var existing_tree_density = [];
+                    var cutdown_tree_density = [];
+
                     var cutdown_values = []
                     var cutdown_values_district = []
                     var cutdown_values_overall = []
+
                     for(key in json_data_cut_down)  // same keys in both datasets
                     {
                         if(key == "unknown")
                             continue;
+
+                        existing_tree_density.push({
+                            "value": json_data_exist[key]["absolute"]/DISTRICT_AREA_BY_NAME[key],
+                            "name": key
+                        });
+                        cutdown_tree_density.push({
+                            "value": json_data_cut_down[key]["absolute"]/DISTRICT_AREA_BY_NAME[key],
+                            "name": key
+                        });
 
                         axis_keys.push(key)
                         existing_values.push(json_data_exist[key]["absolute"]);
@@ -1738,6 +1803,11 @@
 
                     draw_pie_chart(cutdown_values_overall, "overview_districts_tree_count_perc_overall", CHARTS_COLORSET_DEFAULT, true)
                     draw_simple_bar_chart(cutdown_values_district, "overview_districts_cut_tree_count_perc_district", CHARTS_COLORSET_BLACK)
+                
+                    draw_simple_bar_chart(existing_tree_density, "overview_districts_trees_area_num", CHARTS_COLORSET_BLACK)
+                    draw_simple_bar_chart(cutdown_tree_density, "overview_districts_cut_trees_area_num", CHARTS_COLORSET_BLACK)
+                    //overview_districts_trees_area_num //DISTRICT_AREA_BY_NAME
+                    // overview_districts_cut_trees_area_num
                 })
             })
 
