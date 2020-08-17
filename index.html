@@ -69,6 +69,30 @@
             background-color: #ccc;
         }
 
+        .legend {
+            background-color: #fff;
+            border-radius: 3px;
+            bottom: 30px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            padding: 10px;
+            position: absolute;
+            right: 10px;
+            z-index: 1;
+        }
+        
+        .legend h4 {
+            margin: 0 0 10px;
+        }
+        
+        .legend div span {
+            border-radius: 50%;
+            display: inline-block;
+            height: 10px;
+            margin-right: 5px;
+            width: 10px;
+        }
+
         /* ************************** */
         /* widgets */
         /* ************************** */
@@ -269,12 +293,40 @@
             <!-- the map with map options button -->
             <!-- ********************** -->
             <div id="tree_map">
-                <ons-fab style="position: absolute; bottom: 40px; right: 40px;" onclick="fn.open()">
+                <!-- <ons-fab style="position: absolute; bottom: 40px; right: 40px;" onclick="fn.open()">
                     <ons-icon icon="md-plus"></ons-icon>
-                </ons-fab>
-            </div>
-            
+                </ons-fab> -->
+                <div id="state-legend" class="legend">
+                    <h4>Age of trees</h4>
+                    <div><span style="background-color: #c3eb34"></span>&lt;= 25 years</div>
+                    <div><span style="background-color: #7aeb34"></span>26 - 40 years</div>
+                    <div><span style="background-color: #2ed93c"></span>&gt; 40 years</div>
+                    <div><span style="background-color: #4f96c9"></span>unknown</div>
 
+                    <div style="margin-top: 10px;">
+                        <span style="background-color: #ff0000"></span>presumed cut down
+                    </div>
+
+                    <div style="
+                    margin-top: 20px;
+                    padding: 3px;
+                    border: 1px solid #ccc;
+                    border-radius: 5px;
+                    cursor: pointer;" onclick="fn.open()">
+                        <ons-icon icon="fa-cog" size="20px" style="
+                        font-size: 20px;
+                        background-color: #b9b9b9;
+                        padding: 5px;
+                        border-radius: 105px;
+                        color: #525252;
+                        "></ons-icon>
+                        <span style="margin-left: 5px; width: 150px;">Modify map display</span>
+                    </div>
+                </div>
+            </div>
+
+            
+            
             <!-- ********************** -->
             <!-- content -->
             <!-- ********************** -->
@@ -294,7 +346,7 @@
                     <br><br>
                     <b>Please note:</b><br>
                     Both Cologne "Baumkataster" datasets are obviously far from being a complete depiction of the tree distribution throughout the city.<br>
-                    For a quick illustration, please change to "satellite" display in the map options (the blue button in the lower right corner on the map), zoom in at any point and compare the rendered 
+                    For a quick illustration, please change to "satellite" display in the map options, zoom in at any point and compare the rendered 
                     tree datapoints with trees that you can identify on the satelite image.<br><br>
                     <b>Overcoming the dataset limitations</b><br>
                     A separate machine learning project for object detection on orthographic images, or more specificially: tree crown detection on urban landscapes, 
