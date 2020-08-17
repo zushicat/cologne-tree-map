@@ -293,11 +293,11 @@
             <!-- the map with map options button -->
             <!-- ********************** -->
             <div id="tree_map">
-                <!-- <ons-fab style="position: absolute; bottom: 40px; right: 40px;" onclick="fn.open()">
-                    <ons-icon icon="md-plus"></ons-icon>
-                </ons-fab> -->
+                <!-- ***** -->
+                <!-- legend -->
+                <!-- ***** -->
                 <div id="state-legend" class="legend">
-                    <h4>Age of trees</h4>
+                    <h5>Age of trees</h5>
                     <div><span style="background-color: #c3eb34"></span>&lt;= 25 years</div>
                     <div><span style="background-color: #7aeb34"></span>26 - 40 years</div>
                     <div><span style="background-color: #2ed93c"></span>&gt; 40 years</div>
@@ -323,9 +323,25 @@
                         <span style="margin-left: 5px; width: 150px;">Modify map display</span>
                     </div>
 
-                    <div style="margin-top: 20px; width: 150px;">
+                    <div style="margin-top: 20px; max-width: 200px;">
                         For details about individual trees, please click on the respective tree markers.
                     </div>
+                </div>
+
+                <!-- ***** -->
+                <!-- currently displayed districts -->
+                <!-- ***** -->
+                <div class="legend" style="
+                left: 10px;
+                top: 10px;
+                right: auto;
+                bottom: auto;
+                ">
+                    <h5>Currently displayed districts</h5>
+                    <ul id="map_info_displayed_districts">
+                        <li>Innenstadt</li>
+                    </ul>
+                    <div style="margin-top: 5px; max-width: 250px;">Please modify map display to see trees in different districts.</div>
                 </div>
             </div>
 
@@ -828,6 +844,7 @@
                 {
                     if(this.checked == true)
                     {
+                        
                         DISPLAY_TREES_DISTRICTS.push(this.getAttribute("data-district"))
                     }
                     else  // remove de-selected from global list
@@ -836,7 +853,9 @@
                             if(DISPLAY_TREES_DISTRICTS[j] === this.getAttribute("data-district"))
                                 DISPLAY_TREES_DISTRICTS.splice(j, 1); 
                     }
+                    
                     toogle_display_trees_district();
+                    change_text_map_info();
                 });
             }
 
@@ -848,7 +867,6 @@
             {
                 bla[i].addEventListener('click', function()
                 {
-                    console.log(this.value);
                     if(this.value == "satellite")
                         MAP.setStyle("mapbox://styles/mapbox/satellite-v9");
                     else
@@ -1305,9 +1323,13 @@
             var map_layer_id = "districts_layer";
             
             if(DISPLAY_DISTRICT_BORDERS == false)
+            {
                 MAP.setLayoutProperty(map_layer_id, "visibility", "none");
+            }
             else 
+            {
                 MAP.setLayoutProperty(map_layer_id, "visibility", "visible");
+            }
         }
 
         function toogle_display_trees_district()
@@ -1323,9 +1345,13 @@
                 {
                     var current_district_num = map_layer[i].id.replace("all_trees_layer_", "");
                     if(DISPLAY_TREES_DISTRICTS.includes(current_district_num))
+                    {
                         MAP.setLayoutProperty(map_layer[i].id, "visibility", "visible");
+                    }
                     else
+                    {
                         MAP.setLayoutProperty(map_layer[i].id, "visibility", "none");
+                    }
                 }
 
                 if(map_layer[i].id.indexOf("cut_trees_layer_") != -1)
@@ -1343,6 +1369,26 @@
             //     var map_layer_id = "all_trees_layer_" + DISPLAY_TREES_DISTRICTS[i];
             //     MAP.setLayoutProperty(map_layer_id, "visibility", "visible");
             // }
+        }
+
+        function change_text_map_info()
+        {
+            $("#map_info_displayed_districts").empty();
+
+            if(DISPLAY_TREES_DISTRICTS.length == 0)
+            {
+                $("#map_info_displayed_districts").append("<li>no district selected</li>");
+            }
+            else
+            {
+                for(var i in DISPLAY_TREES_DISTRICTS)
+                {
+                    var district_id = DISPLAY_TREES_DISTRICTS[i];
+                    var district_name = DISTRICT_NAMES_BY_ID[district_id];
+
+                    $("#map_info_displayed_districts").append("<li>" + district_name + "</li>");
+                }
+            }
         }
 
         // **************************************************************
