@@ -163,6 +163,8 @@
                 <p class="widget-head">Tree map display options</p>
                 <ons-list>
                     <!-- ***** -->
+                    <!-- age group -->
+                    <!-- ***** -->
                     <ons-list-item tappable>
                         <ons-row>
                             <ons-col>
@@ -206,6 +208,8 @@
                         </ons-row>
                     </ons-list-item>
 
+                    <!-- ***** -->
+                    <!-- map / satellite / suburb borders -->
                     <!-- ***** -->
                     <ons-list-item>
                         <ons-row>
@@ -256,6 +260,8 @@
                     </ons-list-item> -->
 
                     <!-- ***** -->
+                    <!-- districts -->
+                    <!-- ***** -->
                     <ons-list-item>
                         <ons-row>
                             <ons-col>
@@ -267,6 +273,14 @@
                         </ons-row>
                     </ons-list-item>
                 </ons-list>
+            </div>
+
+            <div>
+                <ons-row>
+                    <ons-col style="text-align: center;">
+                        <ons-button id="menu_ok_button">OK</ons-button>
+                    </ons-col>
+                </ons-row>
             </div>
         </ons-page>
     </template>
@@ -860,6 +874,17 @@
         // *************************************************************
         function add_navigation_elements_event_handler()
         {
+            // **********
+            // menu close on ok
+            // **********
+            var menu = document.getElementById('side_menu');
+            $("#menu_ok_button").on("click", function()
+            {
+                menu.close()
+            });
+                
+
+
             // **********
             // expandabale list for districts is default expanded
             // **********
