@@ -85,7 +85,7 @@
             margin: 0 0 10px;
         }
         
-        .legend div span {
+        .legend div span, .bulletpoints div span {
             border-radius: 50%;
             display: inline-block;
             height: 10px;
@@ -594,6 +594,32 @@
                         </ons-col>
                     </ons-row>
                 </div> 
+
+                <!-- ********************** -->
+                <!-- districts |-> tree count
+                <!-- ********************** -->
+                <div class="widget-content">
+                    <p class="widget-head">Age groups by district</p>
+                    <p>
+                        How are age groups distributed throughout the districts?
+                        <div class="bulletpoints">
+                            <div style="float: left; margin-right: 20px;"><span style="background-color: #c3eb34"></span>&lt;= 25 years</div>
+                            <div style="float: left; margin-right: 20px;"><span style="background-color: #7aeb34"></span>26 - 40 years</div>
+                            <div style="float: left; margin-right: 20px;"><span style="background-color: #2ed93c"></span>&gt; 40 years</div>
+                            <div style="float: left; margin-right: 20px;"><span style="background-color: #4f96c9"></span>unknown</div>
+                        </div>
+                    </p>
+                    <ons-row>
+                        <ons-col class="echart_col">
+                            <p>Absolute numbers of trees by age group</p>
+                            <div id="overview_districts_age_groups_num" class="echart half_page_width"></div>
+                        </ons-col>
+                        <ons-col class="echart_col">
+                            <p>Share of age groups in district</p>
+                            <div id="overview_districts_age_groups_perc" class="echart half_page_width"></div>
+                        </ons-col>
+                    </ons-row>
+                </div>
 
                 <!-- ********************** -->
                 <!-- districts |-> trees per square km
@@ -1835,6 +1861,36 @@
                     // overview_districts_cut_trees_area_num
                 })
             })
+
+            // districts |-> age group
+            get_json_data("districts/age_groups_with_predictions.json", function(json_data)
+            {
+                var axis_keys = [];
+                var age_group_vals_num = {"0": [], "1": [], "2": [], "unknown": []};
+                var age_group_vals_perc = {"0": [], "1": [], "2": [], "unknown": []};
+                
+                for(key in json_data)  // same keys in both datasets
+                {
+                    if(key == "unknown")
+                        continue;
+                    
+                    axis_keys.push(key)
+                    for(var agekey in json_data[key])
+                    {
+                        age_group_vals_num[agekey].push(json_data[key][agekey]["absolute"]);
+                        age_group_vals_perc[agekey].push( (json_data[key][agekey]["percentage"] * 100).toFixed(0) );
+                    }
+                }
+                var data_num = [];
+                var data_perc = [];
+                for(var i in Object.values(age_group_vals_num))  // i is corresponding
+                {
+                    data_num.push({"type": 'bar', "stack": 'districts', "data": Object.values(age_group_vals_num)[i]});
+                    data_perc.push({"type": 'bar', "stack": 'districts', "data": Object.values(age_group_vals_perc)[i]});
+                }
+                draw_stacked_bar_chart(data_num, axis_keys, "overview_districts_age_groups_num", CHARTS_COLORSET_AGE_GROUPS);
+                draw_stacked_bar_chart(data_perc, axis_keys, "overview_districts_age_groups_perc", CHARTS_COLORSET_AGE_GROUPS);
+            });
 
             // genus |-> year_sprout / bole_radius comparison: gt / regression
             // get_json_data("genus/regression_bole_radius_year_sprout.json", function(json_data_regression)
