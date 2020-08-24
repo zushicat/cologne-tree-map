@@ -430,12 +430,16 @@
                                 (Those trees appear in the 2017 dataset but not in the 2020 dataset.)<br><br>
                                 <b>Please note</b> the 
                                 <a href="https://github.com/zushicat/cologne-trees-data/blob/master/dataschema.md">explanation of the merging process</a>
-                                for both datasets (first note on top of the page).
+                                for both datasets (first note on top of the page).<br>
+                                <a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/meta/overall_tree_count.json" target="_blank">[JSON data]</a>
                             </p>
                         </ons-col>
                         <ons-col class="echart_col">
                             <p>Mean Data Completeness</p>
                             <div id="overview_data_completeness" class="echart half_page_width"></div>
+                            <p>
+                                <a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/meta/data_completeness.json" target="_blank">[JSON data]</a>
+                            </p>
                         </ons-col>
                     </ons-row>
                 </div>
@@ -472,7 +476,8 @@
                                     whereas object types which could be summarized under parks & recreation are under-represented. <br>
                                     <b>But</b> random samples also show that many trees in such surroundings are wrongly categorized as 
                                     "building/school/dormitory (home) building" (or not at all), hence these findings should be considered
-                                    as highly unreliable.
+                                    as highly unreliable.<br>
+                                    <a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/object_type/tree_count.json" target="_blank">[JSON data]</a>
                                 </p>
                             </div>
                         </ons-col>
@@ -489,7 +494,8 @@
                                         <li>unknown</li>
                                     </ul>
                                     have a significant share within the data of (presumably) cut down trees with felled
-                                    trees in street surroundings with approx. half of the share clearly in top position.
+                                    trees in street surroundings with approx. half of the share clearly in top position.<br>
+                                    <a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/object_type/cut_tree_count.json" target="_blank">[JSON data]</a>
                                 </p>
                             </div>
                         </ons-col>
@@ -505,10 +511,16 @@
                         <ons-col class="echart_col">
                             <p>Existing trees</p>
                             <div id="overview_agegroups_tree_count" class="echart half_page_width"></div>
+                            <p>
+                                <a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/agegroups/tree_count_with_predictions.json" target="_blank">[JSON data]</a>
+                            </p>
                         </ons-col>
                         <ons-col class="echart_col">
                             <p>Cut down trees</p>
                             <div id="overview_agegroups_cut_tree_count" class="echart half_page_width"></div>
+                            <p>
+                                <a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/agegroups/cut_tree_count_with_predictions.json" target="_blank">[JSON data]</a>
+                            </p>
                         </ons-col>
                     </ons-row>
                     <p style="text-align: left;">
@@ -516,7 +528,7 @@
                         applied to each individual tree) due to the unreliable and incomplete (individual) age data in the original datasets.
                         <br><br>
                         <b>Please note:</b><br>
-                        The age (and consequently the age group  as of 2020) refers to the real age (instead of the planting year as reference). 
+                        The age (and consequently the age group  as of 2020) refers to the real age (instead of the planting year). 
                         City trees are usually planted at an age between 8 - 12 years.
                     </p>
                 </div>
@@ -541,10 +553,16 @@
                         <ons-col class="echart_col">
                             <p>Distribution in %</p>
                             <div id="overview_genus_tree_count_perc" class="echart half_page_width"></div>
+                            <p>
+                                <a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/genus/tree_count_with_prediction.json" target="_blank">[JSON data]</a>
+                            </p>
                         </ons-col>
                         <ons-col class="echart_col">
                             <p>Distribution in %</p>
                             <div id="overview_genus_cut_tree_count_perc" class="echart half_page_width"></div>
+                            <p>
+                                <a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/genus/cut_tree_count_with_prediction.json" target="_blank">[JSON data]</a>
+                            </p>
                         </ons-col>
                     </ons-row>
                 </div>
@@ -593,6 +611,14 @@
                             </p>
                         </ons-col>
                     </ons-row>
+                    <ons-row>
+                        <ons-col>
+                            <p>
+                                <a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/districts/tree_count.json" target="_blank">[JSON data]</a>
+                                <a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/districts/cut_tree_count.json" target="_blank">[JSON data]</a>
+                            </p>
+                        </ons-col>
+                    </ons-row>
                 </div> 
 
                 <!-- ********************** -->
@@ -617,6 +643,13 @@
                         <ons-col class="echart_col">
                             <p>Share of age groups in district</p>
                             <div id="overview_districts_age_groups_perc" class="echart half_page_width"></div>
+                        </ons-col>
+                    </ons-row>
+                    <ons-row>
+                        <ons-col>
+                            <p>
+                                <a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/districts/age_groups_with_predictions.json" target="_blank">[JSON data]</a>
+                            </p>
                         </ons-col>
                     </ons-row>
                 </div>
@@ -1653,7 +1686,7 @@
             // *********
             // object type
             // *********
-            // tree count |---> bar / oie chart 
+            // tree count |---> bar / pie chart 
             get_json_data("object_type/tree_count.json", function(json_data)
             {
                 var data_abs = [];
