@@ -729,6 +729,9 @@
               </ons-toolbar>
 
             <div class="content_container">
+                <!-- ********************** -->
+                <!-- suburbs |-> tree / tree cut count
+                <!-- ********************** -->
                 <div class="widget-content">
                     <p class="widget-head">Suburb tree distribution</p>
                     <p>How many trees are in which suburb?</p>
@@ -757,6 +760,57 @@
                             <div id="overview_suburbs_cut_tree_count_perc_district" class="echart half_page_width"></div>
                             <p style="text-align: left;">
                                 
+                            </p>
+                        </ons-col>
+                    </ons-row>
+                </div>
+            
+                <!-- ********************** -->
+                <!-- districts |-> age groups
+                <!-- ********************** -->
+                <div class="widget-content">
+                    <p class="widget-head">Age groups by suburbs</p>
+                    <p>
+                        How are age groups distributed throughout the suburbs?
+                        <div class="bulletpoints">
+                            <div style="float: left; margin-right: 20px;"><span style="background-color: #c3eb34"></span>&lt;= 25 years</div>
+                            <div style="float: left; margin-right: 20px;"><span style="background-color: #7aeb34"></span>26 - 40 years</div>
+                            <div style="float: left; margin-right: 20px;"><span style="background-color: #2ed93c"></span>&gt; 40 years</div>
+                            <div style="float: left; margin-right: 20px;"><span style="background-color: #4f96c9"></span>unknown</div>
+                        </div>
+                    </p>
+                    <ons-row>
+                        <ons-col class="echart_col">
+                            <p>Absolute numbers of trees by age group</p>
+                            <div id="overview_suburbs_age_groups_num" class="echart half_page_width"></div>
+                        </ons-col>
+                        <ons-col class="echart_col">
+                            <p>Share of age groups in each district</p>
+                            <div id="overview_suburbs_age_groups_perc" class="echart half_page_width"></div>
+                        </ons-col>
+                    </ons-row>
+                    <ons-row>
+                        <ons-col>
+                            <p>
+                                <a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/suburbs/age_groups_with_predictions.json" target="_blank">[JSON data]</a>
+                            </p>
+                        </ons-col>
+                    </ons-row>
+
+                    <ons-row>
+                        <ons-col class="echart_col">
+                            <p>Absolute numbers of cut down trees by age group</p>
+                            <div id="overview_suburbs_cut_trees_age_groups_num" class="echart half_page_width"></div>
+                        </ons-col>
+                        <ons-col class="echart_col">
+                            <p>Share of age groups (cut down trees) in each suburb</p>
+                            <div id="overview_suburbs_cut_trees_age_groups_perc" class="echart half_page_width"></div>
+                        </ons-col>
+                    </ons-row>
+                    <ons-row>
+                        <ons-col>
+                            <p>
+                                <a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/suburbs/cut_tree_age_groups_with_predictions.json" target="_blank">[JSON data]</a>
                             </p>
                         </ons-col>
                     </ons-row>
@@ -1926,11 +1980,24 @@
                         continue;
                     
                     axis_keys.push(key)
-                    for(var agekey in json_data[key])
+                    var age_keys = ["0", "1", "2", "unknown"];
+                    age_keys.forEach(function (agekey, i) 
                     {
-                        age_group_vals_num[agekey].push(json_data[key][agekey]["absolute"]);
-                        age_group_vals_perc[agekey].push( (json_data[key][agekey]["percentage"] * 100).toFixed(0) );
-                    }
+                        var age_value_num = 0;
+                        var age_value_perc = 0;
+                        if(typeof(json_data[key][agekey]) !== "undefined")
+                        {
+                            age_value_num = json_data[key][agekey]["absolute"];
+                            age_value_perc = (json_data[key][agekey]["percentage"] * 100).toFixed(0);
+                        }
+                        age_group_vals_num[agekey].push(age_value_num);
+                        age_group_vals_perc[agekey].push(age_value_perc);
+                    });
+                    // for(var agekey in json_data[key])
+                    // {
+                    //     age_group_vals_num[agekey].push(json_data[key][agekey]["absolute"]);
+                    //     age_group_vals_perc[agekey].push( (json_data[key][agekey]["percentage"] * 100).toFixed(0) );
+                    // }
                 }
                 var data_num = [];
                 var data_perc = [];
@@ -1956,11 +2023,24 @@
                         continue;
                     
                     axis_keys.push(key)
-                    for(var agekey in json_data[key])
+                    var age_keys = ["0", "1", "2", "unknown"];
+                    age_keys.forEach(function (agekey, i) 
                     {
-                        age_group_vals_num[agekey].push(json_data[key][agekey]["absolute"]);
-                        age_group_vals_perc[agekey].push( (json_data[key][agekey]["percentage"] * 100).toFixed(0) );
-                    }
+                        var age_value_num = 0;
+                        var age_value_perc = 0;
+                        if(typeof(json_data[key][agekey]) !== "undefined")
+                        {
+                            age_value_num = json_data[key][agekey]["absolute"];
+                            age_value_perc = (json_data[key][agekey]["percentage"] * 100).toFixed(0);
+                        }
+                        age_group_vals_num[agekey].push(age_value_num);
+                        age_group_vals_perc[agekey].push(age_value_perc);
+                    });
+                    // for(var agekey in json_data[key])
+                    // {
+                    //     age_group_vals_num[agekey].push(json_data[key][agekey]["absolute"]);
+                    //     age_group_vals_perc[agekey].push( (json_data[key][agekey]["percentage"] * 100).toFixed(0) );
+                    // }
                 }
                 var data_num = [];
                 var data_perc = [];
@@ -2168,7 +2248,9 @@
         var CUT_TREE_COUNT = {"districts": {}, "suburbs": {}};
 
         var GENUS = {"districts": {}, "suburbs": {}};  // with predictions
+        var GENUS_CUT = {"districts": {}, "suburbs": {}};  // with predictions
         var AGE_GROUPS = {"districts": {}, "suburbs": {}};  // with predictions
+        var AGE_GROUPS_CUT = {"districts": {}, "suburbs": {}};  // with predictions
         var OBJECT_TYPE = {"districts": {}, "suburbs": {}};
         
         function load_district_page_globals()
@@ -2183,8 +2265,10 @@
             get_json_data("suburbs/cut_tree_count.json", function(json_data) { CUT_TREE_COUNT["suburbs"] = json_data; });
             get_json_data("districts/genus_with_predictions.json", function(json_data) { GENUS["districts"] = json_data; });
             get_json_data("suburbs/genus_with_predictions.json", function(json_data) { GENUS["suburbs"] = json_data; });
+            get_json_data("suburbs/cut_tree_genus_with_predictions.json", function(json_data) { GENUS_CUT["suburbs"] = json_data; });
             get_json_data("districts/age_groups_with_predictions.json", function(json_data) { AGE_GROUPS["districts"] = json_data; });
             get_json_data("suburbs/age_groups_with_predictions.json", function(json_data) { AGE_GROUPS["suburbs"] = json_data; });
+            get_json_data("suburbs/cut_tree_age_groups_with_predictions.json", function(json_data) { AGE_GROUPS_CUT["suburbs"] = json_data; });
             get_json_data("districts/object_type.json", function(json_data) { OBJECT_TYPE["districts"] = json_data; });
             get_json_data("suburbs/object_type.json", function(json_data) { OBJECT_TYPE["suburbs"] = json_data; });
         }
@@ -2215,7 +2299,9 @@
             var current_tree_count_suburbs = {};
             var current_cut_tree_count_suburbs = {};
             var current_genus_suburbs = {};
+            var current_genus_suburbs_cut = {};
             var current_age_groups_suburbs = {};
+            var current_age_groups_suburbs_cut = {};
             var current_object_type_suburbs = {};
 
             for(var i in current_suburbs)
@@ -2225,18 +2311,21 @@
                 current_tree_count_suburbs[s] = TREE_COUNT.suburbs[s];
                 current_cut_tree_count_suburbs[s] = CUT_TREE_COUNT.suburbs[s];
                 current_genus_suburbs[s] = GENUS.suburbs[s];
+                current_genus_suburbs_cut[s] = GENUS_CUT.suburbs[s];
                 current_age_groups_suburbs[s] = AGE_GROUPS.suburbs[s];
+                current_age_groups_suburbs_cut[s] = AGE_GROUPS_CUT.suburbs[s];
                 current_object_type_suburbs[s] = OBJECT_TYPE.suburbs[s];
             }
             
-            create_tree_count_data(current_tree_count_suburbs, current_cut_tree_count_suburbs)
+            create_suburbs_tree_count_data(current_tree_count_suburbs, current_cut_tree_count_suburbs);
+            create_suburbs_age_groups(current_age_groups_suburbs, current_age_groups_suburbs_cut);
         }
 
 
         // **************
         //
         // **************
-        function create_tree_count_data(json_data_exist, json_data_cut_down)
+        function create_suburbs_tree_count_data(json_data_exist, json_data_cut_down)
         {
             var tmp_district_values = {};
             var data_piechart = []
@@ -2305,7 +2394,53 @@
             draw_simple_bar_chart(cutdown_values_district, "overview_suburbs_cut_tree_count_perc_district", CHARTS_COLORSET_BLACK);
         }
 
+        function create_suburbs_age_groups(json_data_exist, json_data_cut_down)
+        {
+            // *****
+            //
+            // *****
+            for(var i in [json_data_exist, json_data_cut_down])
+            {
+                var json_data = [json_data_exist, json_data_cut_down][i];
+                var div_name_modifier = "";
+                if(i==1)
+                    div_name_modifier = "cut_trees_";
 
+                var axis_keys = [];
+                var age_group_vals_num = {"0": [], "1": [], "2": [], "unknown": []};
+                var age_group_vals_perc = {"0": [], "1": [], "2": [], "unknown": []};
+                
+                for(key in json_data)  // same keys in both datasets
+                {
+                    if(key == "unknown")
+                        continue;
+                    
+                    axis_keys.push(key)
+                    var age_keys = ["0", "1", "2", "unknown"];
+                    age_keys.forEach(function (agekey, i) 
+                    {
+                        var age_value_num = 0;
+                        var age_value_perc = 0;
+                        if(typeof(json_data[key][agekey]) !== "undefined")
+                        {
+                            age_value_num = json_data[key][agekey]["absolute"];
+                            age_value_perc = (json_data[key][agekey]["percentage"] * 100).toFixed(0);
+                        }
+                        age_group_vals_num[agekey].push(age_value_num);
+                        age_group_vals_perc[agekey].push(age_value_perc);
+                    });
+                }
+                var data_num = [];
+                var data_perc = [];
+                for(var i in Object.values(age_group_vals_num))  // i is corresponding
+                {
+                    data_num.push({"type": 'bar', "stack": 'districts', "data": Object.values(age_group_vals_num)[i]});
+                    data_perc.push({"type": 'bar', "stack": 'districts', "data": Object.values(age_group_vals_perc)[i]});
+                }
+                draw_stacked_bar_chart(data_num, axis_keys, "overview_suburbs_" + div_name_modifier + "age_groups_num", CHARTS_COLORSET_AGE_GROUPS);
+                draw_stacked_bar_chart(data_perc, axis_keys, "overview_suburbs_" + div_name_modifier + "age_groups_perc", CHARTS_COLORSET_AGE_GROUPS);
+            }
+        }
     
     </script>
 </body>
