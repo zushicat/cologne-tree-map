@@ -2339,6 +2339,14 @@
             var cutdown_values_district = []
             var cutdown_values_overall = []
             
+            var num_all_trees_existing = 0
+            var num_all_trees_cut_down = 0
+            for(key in json_data_exist)  // same keys in both datasets
+            {
+                num_all_trees_existing += json_data_exist[key]["absolute"];
+                num_all_trees_cut_down += json_data_cut_down[key]["absolute"];
+            }
+
             for(key in json_data_exist)  // same keys in both datasets
             {
                 if(key == "unknown")
@@ -2370,13 +2378,13 @@
                 }
                 
                 try {
-                    cutdown_values_overall.push({"value": (json_data_cut_down[key]["percentage"]*100).toFixed(2), "name": key});
+                    cutdown_values_overall.push({"value": ((json_data_cut_down[key]["absolute"]/num_all_trees_cut_down)*100).toFixed(2), "name": key});
                 } catch {
                     cutdown_values_overall.push({"value": 0, "name": key});
                 }
 
                 try {
-                    data_piechart.push({"value": (json_data_exist[key]["percentage"]*100).toFixed(2), "name": key});
+                    data_piechart.push({"value": ((json_data_exist[key]["absolute"]/num_all_trees_existing)*100).toFixed(2), "name": key});
                 } catch {
                     data_piechart.push({"value": 0, "name": key});
                 }
