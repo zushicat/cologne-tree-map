@@ -450,7 +450,7 @@
                 <!-- ********************** -->
                 <div class="widget-content">
                     <p class="widget-head">Distribution by Object Types</p>
-                    <p>In which surrounding is a tree located?</p>
+                    <p>In which environment are trees locateded according to the tree inventories?</p>
                     <ons-row>
                         <ons-col class="echart_col">
                             <p>Existing trees</p>
@@ -499,6 +499,38 @@
                                     <a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/object_type/cut_tree_count.json" target="_blank">[JSON data]</a>
                                 </p>
                             </div>
+                        </ons-col>
+                    </ons-row>
+                </div>
+
+                <!-- ********************** -->
+                <!-- location type -->
+                <!-- ********************** -->
+                <div class="widget-content">
+                    <p class="widget-head">Distribution by Location Types</p>
+                    <p>In which environment are trees located according to a geolocation match with OpenStreetMaps (OSM) data?</p>
+                    <ons-row>
+                        <ons-col class="echart_col">
+                            <p>Existing trees by broad categories</p>
+                            <div id="overview_location_type_tree_count" class="echart half_page_width"></div>
+                            <p><a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/location_type/tree_count_location_type.json" target="_blank">[JSON data]</a></p>
+                        </ons-col>
+                        <ons-col class="echart_col">
+                            <p>Cut down trees by broad categories</p>
+                            <div id="overview_location_type_cut_tree_count" class="echart half_page_width"></div>
+                            <p><a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/location_type/cut_tree_count_location_type.json" target="_blank">[JSON data]</a></p>
+                        </ons-col>
+                    </ons-row>
+                    <ons-row>
+                        <ons-col class="echart_col">
+                            <p>Existing trees: Detailled green space environment</p>
+                            <div id="overview_location_type_tree_count_osm_key" class="echart half_page_width"></div>
+                            <p><a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/location_type/tree_count_osm_keys.json" target="_blank">[JSON data]</a></p>
+                        </ons-col>
+                        <ons-col class="echart_col">
+                            <p>Cut down trees:  Detailled green space environment</p>
+                            <div id="overview_location_type_cut_tree_count_osm_key" class="echart half_page_width"></div>
+                            <p><a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/location_type/cut_tree_count_osm_keys.json" target="_blank">[JSON data]</a></p>
                         </ons-col>
                     </ons-row>
                 </div>
@@ -1793,6 +1825,53 @@
                 
                 draw_simple_bar_chart(data_abs, "overview_object_type_cut_tree_count", CHARTS_COLORSET_BLACK)
                 draw_pie_chart(data_perc, "overview_object_type_cut_tree_count_perc", CHARTS_COLORSET_DEFAULT, true)
+            });
+
+            // *********
+            // location type
+            // *********
+            // (cut / existing) tree count: location type |---> bar
+            get_json_data("location_type/tree_count_location_type.json", function(json_data)
+            {
+                get_json_data("location_type/cut_tree_count_location_type.json", function(json_data_cut)
+                {
+                    var data = [];
+                    var data_cut = []
+                    for(key in json_data)  // corresponding keys
+                    {
+                        var value = json_data[key];
+                        var value_cut = json_data_cut[key];
+                        data.push({"value": value, "name": key.replace(/_/g, " ")});
+                        data_cut.push({"value": value_cut, "name": key.replace(/_/g, " ")});
+                    }
+                    
+                    draw_simple_bar_chart(data, "overview_location_type_tree_count", CHARTS_COLORSET_BLACK)
+                    draw_simple_bar_chart(data_cut, "overview_location_type_cut_tree_count", CHARTS_COLORSET_BLACK)
+                });
+            });
+
+            // (cut / existing) tree count: location osm key |---> bar
+            get_json_data("location_type/tree_count_osm_keys.json", function(json_data)
+            {
+                get_json_data("location_type/cut_tree_count_osm_keys.json", function(json_data_cut)
+                {
+                    var data = [];
+                    var data_cut = []
+                    for(key in json_data)  // corresponding keys
+                    {
+                        var value = json_data[key];
+                        var value_cut = json_data_cut[key];
+
+                        if(key == "highway")
+                            continue;
+
+                        data.push({"value": value, "name": key.replace(/_/g, " ")});
+                        data_cut.push({"value": value_cut, "name": key.replace(/_/g, " ")});
+                    }
+                    
+                    draw_simple_bar_chart(data, "overview_location_type_tree_count_osm_key", CHARTS_COLORSET_BLACK)
+                    draw_simple_bar_chart(data_cut, "overview_location_type_cut_tree_count_osm_key", CHARTS_COLORSET_BLACK)
+                });
             });
 
             // *********
