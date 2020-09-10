@@ -1867,7 +1867,7 @@
                         var value = json_data[key];
                         var value_cut = json_data_cut[key];
 
-                        if(key == "highway")
+                        if(key == "highway" || key == "unknown")
                             continue;
 
                         data.push({"value": value, "name": key.replace(/_/g, " ")});
