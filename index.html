@@ -205,6 +205,14 @@
                                     unknown
                                 </label>
                             </ons-col>
+                            <ons-col width="150px">
+                                <label class="left">
+                                    <ons-checkbox class="nav_cut_down_checkbox" input-id="nav_filter_cut_down" checked></ons-checkbox>
+                                </label>
+                                <label for="nav_filter_cut_down" class="center">
+                                    cut down trees
+                                </label>
+                            </ons-col>
                         </ons-row>
                     </ons-list-item>
 
@@ -224,26 +232,65 @@
                                     <ons-radio name="nav_switch_map_style" value="streets" input-id="nav_switch_map_style_streets" checked></ons-radio>
                                     Streets
                                 </label>
-                                <!-- <label for="nav_switch_map_style_streets" class="center">
-                                    Streets
-                                </label> -->
                             </ons-col>
                             <ons-col width="130px">
                                 <label class="left">
                                     <ons-radio name="nav_switch_map_style" value="satellite" input-id="nav_switch_map_style_satellite"></ons-radio>
                                     Satellite
                                 </label>
-                                <!-- <label for="nav_switch_map_style_streets" class="center">
-                                    Satellite
-                                </label> -->
                             </ons-col>
-
                             <ons-col width="200px">
                                 <label class="left">
                                     <ons-checkbox input-id="nav_show_district_borders" checked></ons-checkbox>
                                 </label>
                                 <label for="nav_show_district_borders" class="center">
                                     Show suburb borders
+                                </label>
+                            </ons-col>
+                        </ons-row>
+                    </ons-list-item>
+
+                    <!-- ***** -->
+                    <!-- location type -->
+                    <!-- ***** -->
+                    <ons-list-item tappable>
+                        <ons-row>
+                            <ons-col>
+                                <p>Select location types</p>
+                            </ons-col>
+                        </ons-row>
+
+                        <ons-row>
+                            <ons-col width="250px">
+                                <label class="left">
+                                    <ons-checkbox data-locationtype="green_spaces_agriculture" class="nav_location_type_checkbox" input-id="nav_location_type_checkbox_0" checked></ons-checkbox>
+                                </label>
+                                <label for="nav_location_type_checkbox_0" class="center">
+                                    Green spaces agriculture
+                                </label>
+                            </ons-col>
+                            <ons-col width="250px">
+                                <label class="left">
+                                    <ons-checkbox data-locationtype="green_spaces_leisure" class="nav_location_type_checkbox" input-id="nav_location_type_checkbox_1" checked></ons-checkbox>
+                                </label>
+                                <label for="nav_location_type_checkbox_1" class="center">
+                                    Green spaces leisure
+                                </label>
+                            </ons-col>
+                            <ons-col width="130px">
+                                <label class="left">
+                                    <ons-checkbox data-locationtype="highway" class="nav_location_type_checkbox" input-id="nav_location_type_checkbox_2" checked></ons-checkbox>
+                                </label>
+                                <label for="nav_location_type_checkbox_2" class="center">
+                                    Highway
+                                </label>
+                            </ons-col>
+                            <ons-col width="130px">
+                                <label class="left">
+                                    <ons-checkbox data-locationtype="unknown" class="nav_location_type_checkbox" input-id="nav_location_type_checkbox_3" checked></ons-checkbox>
+                                </label>
+                                <label for="nav_location_type_checkbox_3" class="center">
+                                    unknown
                                 </label>
                             </ons-col>
                         </ons-row>
@@ -354,6 +401,13 @@
                     <h5>Currently displayed districts</h5>
                     <ul id="map_info_displayed_districts">
                         <li>Innenstadt</li>
+                    </ul>
+                    <h5>Currently displayed location types</h5>
+                    <ul id="map_info_displayed_location_type">
+                        <li>green spaces agriculture</li>
+                        <li>green spaces leisure</li>
+                        <li>highway</li>
+                        <li>unknown</li>
                     </ul>
                     <div style="margin-top: 5px; max-width: 250px;">Please modify map display for showing trees in different districts.</div>
                 </div>
@@ -887,6 +941,7 @@
         var DISPLAY_DISTRICT_BORDERS = false;
         var DISPLAY_TREES_DISTRICTS = [];
         var DISPLAY_AGE_GROUPS = [];
+        var DISPLAY_LOCATION_TYPES = [];
 
         var DISTRICT_NAMES_BY_ID = {
             "1": "Innenstadt",
@@ -1105,15 +1160,38 @@
             // **********
             // switch map style
             // **********
-            var bla = document.querySelectorAll('input[name="nav_switch_map_style"]')
-            for (var i = 0; i < bla.length; i++) 
+            var selectors_style = document.querySelectorAll('input[name="nav_switch_map_style"]')
+            for (var i = 0; i < selectors_style.length; i++) 
             {
-                bla[i].addEventListener('click', function()
+                selectors_style[i].addEventListener('click', function()
                 {
                     if(this.value == "satellite")
                         MAP.setStyle("mapbox://styles/mapbox/satellite-v9");
                     else
                         MAP.setStyle("mapbox://styles/zushicat/ckbcadygg11ao1irxsfxy1jzx")
+                })
+            };
+
+            // **********
+            // switch cut down trees
+            // **********
+            var selectors_cut_down = document.querySelectorAll('.nav_cut_down_checkbox')
+            for (var i = 0; i < selectors_cut_down.length; i++) 
+            {
+                selectors_cut_down[i].addEventListener('click', function()
+                {
+                    var visibility = "visible"
+                    if(this.checked == true)
+                        visibility = "visible"
+                    else
+                        visibility = "none"
+                    // console.log(this.getAttribute("checked"), this, this.value)
+
+                    for(var i in SUBURB_LIST)
+                    {
+                        var tmp_layer = "cut_trees_layer_" + SUBURB_LIST[i]
+                        MAP.setLayoutProperty(tmp_layer, "visibility", visibility);
+                    }
                 })
             };
 
@@ -1139,7 +1217,35 @@
                             if(DISPLAY_AGE_GROUPS[j] === this.getAttribute("data-agegroup"))
                                 DISPLAY_AGE_GROUPS.splice(j, 1); 
                     }
-                    filter_display_age_groups();
+                    // filter_display_age_groups();
+                    set_filter_display_selection();
+                });
+            }
+
+            // **********
+            // filter location type display
+            // **********
+            var checkbox_selector_age_group_display = document.querySelectorAll('.nav_location_type_checkbox')
+            for (var i = 0; i < checkbox_selector_age_group_display.length; i++) 
+            {
+                // init
+                if(checkbox_selector_age_group_display[i].getAttribute("checked") != null) 
+                DISPLAY_LOCATION_TYPES.push(checkbox_selector_age_group_display[i].getAttribute("data-locationtype"));
+                
+                checkbox_selector_age_group_display[i].addEventListener('click', function()
+                {
+                    if(this.checked == true)
+                    {
+                        DISPLAY_LOCATION_TYPES.push(this.getAttribute("data-locationtype"))
+                    }
+                    else  // remove de-selected from global list
+                    {
+                        for(var j = 0; j < DISPLAY_LOCATION_TYPES.length; j++)
+                            if(DISPLAY_LOCATION_TYPES[j] === this.getAttribute("data-locationtype"))
+                                DISPLAY_LOCATION_TYPES.splice(j, 1); 
+                    }
+                    set_filter_display_selection();
+                    change_text_map_info();
                 });
             }
         }
@@ -1217,7 +1323,7 @@
 
                                             var genus = tree_data.genus;
                                             var in_dataset_2020 = tree_data.in_dataset_2020;
-                                            var object_type = tree_data.object_type;
+                                            var location_type = tree_data.location_type;
                                             
                                             var district_number = tree_data.district_number;
                                             if(district_number == null)
@@ -1251,7 +1357,7 @@
                                                     "age_group": age_group,
                                                     "genus": genus,
                                                     "in_dataset_2020": in_dataset_2020,
-                                                    "object_type": object_type,
+                                                    "location_type": location_type,
                                                 }
                                             }
 
@@ -1442,22 +1548,22 @@
                         // https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-match
                         'circle-color': [
                         'match',
-                        ['get', 'age_group'],
-                        0,
-                        "#c3eb34",
-                        1,
-                        "#7aeb34",
-                        2,
-                        "#2ed93c",
-                        3,
-                        "#4f96c9", 
-                        /* other */ "#ff0000"
+                            ['get', 'age_group'],
+                            0,
+                            "#c3eb34",
+                            1,
+                            "#7aeb34",
+                            2,
+                            "#2ed93c",
+                            3,
+                            "#4f96c9", 
+                            /* other */ "#ff0000"
                         ]
                     },
                     'layout': 
                     {
                         'visibility': layer_visibility
-                    },
+                    }
                 });
             }
         }
@@ -1617,6 +1723,7 @@
         function change_text_map_info()
         {
             $("#map_info_displayed_districts").empty();
+            $("#map_info_displayed_location_type").empty();
 
             if(DISPLAY_TREES_DISTRICTS.length == 0)
             {
@@ -1632,23 +1739,61 @@
                     $("#map_info_displayed_districts").append("<li>" + district_name + "</li>");
                 }
             }
+
+            if(DISPLAY_LOCATION_TYPES.length == 0)
+            {
+                $("#map_info_displayed_location_type").append("<li>no location type selected</li>");
+            }
+            else
+            {
+                for(var i in DISPLAY_LOCATION_TYPES)
+                {
+                    var location_type_name = DISPLAY_LOCATION_TYPES[i].replace(/_/g, " ");
+                    $("#map_info_displayed_location_type").append("<li>" + location_type_name + "</li>");
+                }
+            }
+            
         }
 
         // **************************************************************
         // filter selection
         // **************************************************************
-        function filter_display_age_groups()
+        function set_filter_display_selection()
         {
-            var tmp_filtered = [];
+            var tmp_filtered_age_group = [];
             for(var i in DISPLAY_AGE_GROUPS)
-                tmp_filtered.push(parseInt(DISPLAY_AGE_GROUPS[i]))
+            tmp_filtered_age_group.push(parseInt(DISPLAY_AGE_GROUPS[i]))
             
+            var tmp_filtered_location_type = [];
+            for(var i in DISPLAY_LOCATION_TYPES)
+                tmp_filtered_location_type.push(DISPLAY_LOCATION_TYPES[i])
+
             for(var i in SUBURB_LIST)
             {
                 var tmp_layer = "all_trees_layer_" + SUBURB_LIST[i]
-                MAP.setFilter(tmp_layer, ['match', ['get', 'age_group'], tmp_filtered, true, false]);
+                MAP.setFilter(
+                    tmp_layer, 
+                    [
+                        "all",
+                        [
+                            'match', 
+                            ['get', 'location_type'], 
+                            tmp_filtered_location_type, 
+                            true, 
+                            false
+                        ],
+                        [
+                            'match', 
+                            ['get', 'age_group'], 
+                            tmp_filtered_age_group, 
+                            true, 
+                            false
+                        ]
+                    ]
+                );
             }
         }
+
 
         // **************************************************************
         //
@@ -1707,14 +1852,14 @@
                     var tree_id = feature.properties.id;
                     var age_group = feature.properties.age_group;
                     var genus = feature.properties.genus;
-                    var object_type = feature.properties.object_type;
                     var in_dataset_2020 = feature.properties.in_dataset_2020;
+                    var location_type = feature.properties.location_type;
 
                     var description_html = "<p>\
                         Tree_ID:<br>" + tree_id + "<br>\
                         Age group: " + age_group + "<br>\
                         Genus: " + genus + "<br>\
-                        Object type: " + object_type + "<br>\
+                        Location type: " + location_type + "<br>\
                         Still existing: " + in_dataset_2020 + "</p>\
                     "
 
