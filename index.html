@@ -572,7 +572,17 @@
                         <ons-col class="echart_col">
                             <p>Existing trees by broad categories</p>
                             <div id="overview_location_type_tree_count" class="echart half_page_width"></div>
-                            <p><a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/location_type/tree_count_location_type.json" target="_blank">[JSON data]</a></p>
+                            
+                            <!-- map percentage in text -->
+                            <div style="text-align: -webkit-left;">
+                                <p>
+                                    <b>Please note</b><br>
+                                    Here, "unknown" means: a tree nether intersects a polygon (broadly) defined as green space, nor a (buffered) polygon of any highway.<br>
+                                    These trees are rather "undefined" since another layer (derived from OSM) could be introduced in the future.<br><br>
+
+                                    <a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/location_type/tree_count_location_type.json" target="_blank">[JSON data]</a>
+                                </p>
+                            </div>
                         </ons-col>
                         <ons-col class="echart_col">
                             <p>Cut down trees by broad categories</p>
