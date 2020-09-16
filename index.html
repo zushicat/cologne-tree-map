@@ -1034,6 +1034,7 @@
                 // https://stackoverflow.com/a/32380583
                 setTimeout(function() 
                 {
+                    console.log(progress_value, text_value)
                     $("#modal_loading_progress_bar").attr("value", progress_value);
                     $("#modal_loading_text").text(text_value);
                 }, 0);
@@ -1042,6 +1043,7 @@
 
         function reset_modal_progress_bar()
         {
+            console.log("reset");
             $("#modal_loading_progress_bar").attr("value", 0);
         }
 
