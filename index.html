@@ -1306,6 +1306,8 @@
             {
                 progress: function (e) {
                     change_modal(parseInt(e.percent), "Load tree data");
+                    if(parseInt(e.percent) == 100)
+                        reset_modal_progress_bar();
                 },
                 callback: function (err, data) 
                 {
