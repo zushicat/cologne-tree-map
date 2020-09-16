@@ -127,9 +127,9 @@
     <!-- modal on init -->
     <!-- ************************************* -->
     <ons-modal direction="up" style="background-color: #aaa;">
-        <div style="text-align: center">
-            <ons-icon icon="md-spinner" size="60px" spin></ons-icon>
-            <p>Loading tree data for map...</p>
+        <div style="width: 400px; margin-left: auto; margin-right: auto;">
+            <ons-progress-bar id="modal_loading_progress_bar" value="0" secondary-value="100"></ons-progress-bar>
+            <p id="modal_loading_text"></p>
         </div>
     </ons-modal>
 
@@ -1025,6 +1025,27 @@
         };
 
         // *************************************************************
+        // change modal loading state
+        // *************************************************************
+        function change_modal(progress_value, text_value)
+        {
+            return Promise.resolve().then(function() 
+            {
+                // https://stackoverflow.com/a/32380583
+                setTimeout(function() 
+                {
+                    $("#modal_loading_progress_bar").attr("value", progress_value);
+                    $("#modal_loading_text").text(text_value);
+                }, 0);
+            });
+        }
+
+        function reset_modal_progress_bar()
+        {
+            $("#modal_loading_progress_bar").attr("value", 0);
+        }
+
+        // *************************************************************
         // event listener (on start)
         // *************************************************************
         document.addEventListener('init', function(event) 
@@ -1282,7 +1303,7 @@
             JSZipUtils.getBinaryContent("src/data/app_data.zip", 
             {
                 progress: function (e) {
-                    // console.log(e.percent + "% of " + e.path+ " loaded")
+                    change_modal(parseInt(e.percent), "Load tree data");
                 },
                 callback: function (err, data) 
                 {
@@ -1304,8 +1325,11 @@
                                     {
                                         try 
                                         {
-                                            // if(i%10000 == 0)
-                                            //     console.log(i);
+                                            if(i%1000 == 0)
+                                            {
+                                                change_modal(parseInt((i/tree_data_lines.length)*100), "Processing tree data")
+                                            }
+                                                
                                             var tree_data = JSON.parse(tree_data_lines[i]);
                                         
                                             var tree_id = tree_data.tree_id;
@@ -1358,17 +1382,6 @@
 
                                             TREE_DATA_BY_ID[tree_id] = tree_data;
                                             TREE_MAP_FEATURES[district_number].push(tree_feature);
-                                            
-                                            // if(in_dataset_2020 == true)
-                                            // {
-                                            //     TREE_DATA_BY_ID[tree_id] = tree_data;
-                                            //     TREE_MAP_FEATURES[district_number].push(tree_feature);
-                                            // }
-                                            // else
-                                            // {
-                                            //     TREE_DATA_BY_ID[tree_id] = tree_data;
-                                            //     CUT_TREE_MAP_FEATURES[district_number].push(tree_feature);
-                                            // }
                                         }
                                         catch { console.log("!!!!") }
                                     }
@@ -1743,6 +1756,7 @@
         function display_map_data()
         {
             console.log("---- do map stuff ----");
+            reset_modal_progress_bar();
             
             init_map();
 
@@ -1751,19 +1765,22 @@
                 create_district_polygon_layer();
                 create_tree_layer();
                 
-                // console.log("render trees on map");
+                console.log("render trees on map");
                 set_filter_display_selection();
 
+                // var count = 0
                 MAP.on('sourcedata', function(e) 
                 {
                     show_modal = e.isSourceLoaded;
                     if (e.isSourceLoaded) 
                     {
-                        // console.log("done rendering");
+                        console.log("done rendering");
                         document.querySelector('ons-modal').hide({animation: "fade"});
                     }
                     else
                     {
+                        // count++;
+                        // console.log("count", count)
                         // console.log("----> SHOW MODAL");
                         // document.querySelector('ons-modal').show();
                     }
