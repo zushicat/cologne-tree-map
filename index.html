@@ -1299,10 +1299,13 @@
                                 if(filename == "trees_cologne_reduced.jsonln")
                                 {
                                     tree_data_lines = content.split("\n");
+                                    // console.log("all: ", tree_data_lines.length);
                                     for(var i in tree_data_lines)
                                     {
                                         try 
                                         {
+                                            // if(i%10000 == 0)
+                                            //     console.log(i);
                                             var tree_data = JSON.parse(tree_data_lines[i]);
                                         
                                             var tree_id = tree_data.tree_id;
