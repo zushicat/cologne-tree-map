@@ -1034,10 +1034,10 @@
                 // https://stackoverflow.com/a/32380583
                 setTimeout(function() 
                 {
-                    // console.log(progress_value, text_value)
+                    console.log("     ", progress_value, text_value)
                     $("#modal_loading_progress_bar").attr("value", progress_value);
                     $("#modal_loading_text").text(text_value);
-                }, 0);
+                }, 10);
             });
         }
 
@@ -1074,6 +1074,8 @@
                 load_tree_data(function()
                 {
                     console.log("---- data loaded ----");
+                    // reset_modal_progress_bar();
+
                     build_district_selection_grid(function()
                     {
                         add_navigation_elements_event_handler();
@@ -2538,8 +2540,12 @@
             var num_all_trees_cut_down = 0
             for(key in json_data_exist)  // same keys in both datasets
             {
-                num_all_trees_existing += json_data_exist[key]["absolute"];
-                num_all_trees_cut_down += json_data_cut_down[key]["absolute"];
+                try {
+                    num_all_trees_existing += json_data_exist[key]["absolute"];
+                } catch {}
+                try {
+                    num_all_trees_cut_down += json_data_cut_down[key]["absolute"];
+                } catch {}
             }
 
             for(key in json_data_exist)  // same keys in both datasets
@@ -2621,18 +2627,20 @@
                     
                     axis_keys.push(key)
                     var age_keys = ["0", "1", "2", "unknown"];
-                    age_keys.forEach(function (agekey, i) 
-                    {
-                        var age_value_num = 0;
-                        var age_value_perc = 0;
-                        if(typeof(json_data[key][agekey]) !== "undefined")
+                    try {
+                        age_keys.forEach(function (agekey, i) 
                         {
-                            age_value_num = json_data[key][agekey]["absolute"];
-                            age_value_perc = (json_data[key][agekey]["percentage"] * 100).toFixed(0);
-                        }
-                        age_group_vals_num[agekey].push(age_value_num);
-                        age_group_vals_perc[agekey].push(age_value_perc);
-                    });
+                            var age_value_num = 0;
+                            var age_value_perc = 0;
+                            if(typeof(json_data[key][agekey]) !== "undefined")
+                            {
+                                age_value_num = json_data[key][agekey]["absolute"];
+                                age_value_perc = (json_data[key][agekey]["percentage"] * 100).toFixed(0);
+                            }
+                            age_group_vals_num[agekey].push(age_value_num);
+                            age_group_vals_perc[agekey].push(age_value_perc);
+                        });
+                    } catch {}
                 }
                 var data_num = [];
                 var data_perc = [];
