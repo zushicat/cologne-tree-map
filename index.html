@@ -348,6 +348,11 @@
                 <div class="center">
                     Cologne Tree Inventory Insights
                 </div>
+                <div class="right">
+                    <a href="#tree_map" style="text-decoration: none;"><ons-toolbar-button>Map</ons-toolbar-button></a>
+                    <a href="#charts_start_container" style="text-decoration: none;"><ons-toolbar-button>Overview charts</ons-toolbar-button></a>
+                    <a href="#district_selection_container" style="text-decoration: none;"><ons-toolbar-button>District selection</ons-toolbar-button></a>
+                </div>
             </ons-toolbar>
 
             <!-- ********************** -->
@@ -471,7 +476,7 @@
                 <!-- ********************** -->
                 <!-- overall existing / data completeness -->
                 <!-- ********************** -->
-                <div class="widget-content">
+                <div id="charts_start_container" class="widget-content">
                     <p class="widget-head">Overall Numbers</p>
                     <p>Dataset Overview</p>
                     <ons-row>
@@ -485,7 +490,7 @@
                                 Those trees appear in the 2017 dataset but not in the 2020 dataset, assuming they were actively taken out of the inventory 
                                 due to the fact they are no longer existing.<br><br>
                                 <b>Please note</b> the 
-                                <a href="https://github.com/zushicat/cologne-trees-data/blob/master/dataschema.md">explanation of the merging process</a>
+                                <a href="https://github.com/zushicat/cologne-trees-data/blob/master/dataschema.md" target="_blank">explanation of the merging process</a>
                                 for both datasets (first note on top of the page), trying to eliminate double entries by proximity check.<br>
                                 <a href="https://zushicat.github.io/cologne-trees-static-API/endpoints/meta/overall_tree_count.json" target="_blank">[JSON data]</a>
                             </p>
@@ -569,7 +574,7 @@
                         In which environment are trees located according to a geolocation match with OpenStreetMap data?
                         <br>
                         For details regarding the naming conventions, please refer to 
-                        <a href="https://github.com/zushicat/cologne-trees-data/blob/master/dataschema.md" taget="_blank">dataschema.md</a> (section: tree_location_type).
+                        <a href="https://github.com/zushicat/cologne-trees-data/blob/master/dataschema.md" target="_blank">dataschema.md</a> (section: tree_location_type).
                     </p>
                     <ons-row>
                         <ons-col class="echart_col">
@@ -801,7 +806,7 @@
                 <!-- ********************** -->
                 <!-- district lists |-> individual district charts -->
                 <!-- ********************** -->
-                <div class="widget-content">
+                <div id="district_selection_container" class="widget-content">
                     <p class="widget-head">Districts details</p>
                     <p>Get detailled insights about individual districts and their suburbs.</p>
                     <br>
